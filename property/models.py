@@ -24,7 +24,7 @@ class Property(models.Model):
         ('NU', 'Nunavut'),
     )
     COUNTRIES = (
-        ('CAN', 'Canada')
+        ('CAN', 'Canada'),
     )
 
     # owner = models.ForeignKey(Users, on_delete=models.SET_NULL)
