@@ -35,7 +35,7 @@ class Property(models.Model):
     description = models.TextField()
     price = models.FloatField()
     property_tax = models.FloatField()
-    # id is postal code, date stamp, alphanum serial padding out to 20 chars
+    # id is postal code (6), date stamp (5), alphanum serial padding out to 20 chars
     id = models.CharField(max_length=20, primary_key=True)
     property_type = models.CharField(max_length=50)
 
