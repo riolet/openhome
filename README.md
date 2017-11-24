@@ -8,7 +8,7 @@
 
 These instructions are for running a development version locally.
 
-Download project
+Download the project
 ```bash
 cd ~/projects
 git clone https://github.com/riolet/openhome/
@@ -33,11 +33,11 @@ GRANT ALL PRIVILEGES ON DATABASE openhomedb TO my_user_name;
 exit
 ```
 
-Configure project local settings, by making file: openhome/openhome/local_settings.py
+Configure local project settings, by making file: openhome/openhome/local_settings.py and filling it with the text below.
 
 Port number defaults to 5432 and is found in /etc/postgresql/<version>/main/postgresql.conf
 
-database/user/password values must match previous step.
+Database, user, and password values must match the previous step.
 ```python
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'abc123secret_key'
@@ -76,8 +76,18 @@ pip3 install -r requirements.txt
 Finish setting up the database
 ```bash
 # working dir: ~/projects/openhome
-
+python3 manage.py makemigrations
 python3 manage.py migrate
+```
+
+Make administrative account for website
+```bash
+python manage.py createsuperuser
+# supply name, email, password
+```
+
+Launch development webserver
+```bash
 python3 manage.py runserver 
 ```
 
