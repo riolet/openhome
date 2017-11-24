@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+</head>
+<body>
+<h1>Properties</h1>
+{% if latest_property_list %}
+    <ul>
+    {% for property in latest_property_list %}
+        <li><a href="{% url 'property:details' property.id %}">{{ property.street_address }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No properties are available in your region.</p>
+{% endif %}
+</body>
+</html>

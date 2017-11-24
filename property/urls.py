@@ -2,8 +2,10 @@ from django.conf.urls import url
 
 from . import views
 
+app_name = 'property'
+
 urlpatterns = [
-    url(r'^$', views.home, name='home'),
+    url(r'^$', views.HomeView.as_view(), name='home'),
     url(r'^results/$', views.search_results, name='search results'),
     url(r'^search/$', views.search, name='search'),
     url(r'^listing/new/$', views.new, name='new'),

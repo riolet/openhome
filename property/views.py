@@ -1,5 +1,17 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.views import generic
+
+from .models import Property
+
+
+class HomeView(generic.ListView):
+    template_name = 'property/home.html'
+    context_object_name = 'latest_property_list'
+
+    def get_queryset(self):
+        # The 5 most recently published properties
+        return Property.objects.order_by('-publish_date')[:5]
 
 
 def home(request):
