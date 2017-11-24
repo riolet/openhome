@@ -1,8 +1,10 @@
+import random
 from django.db import models
 
 
 class Property(models.Model):
     STATUS = (
+        ('U', 'Unpublished'),
         ('S', 'Sold'),
         ('A', 'Available'),
         ('R', 'Removed'),
@@ -27,20 +29,22 @@ class Property(models.Model):
         ('CAN', 'Canada'),
     )
 
+    # Primary key.
+    # id postal code (6), date stamp (5), alphanum serial padding out to 20 chars
+    id = models.CharField(max_length=20, primary_key=True)
+
     # owner = models.ForeignKey(Users, on_delete=models.SET_NULL)
-    published = models.BooleanField(default=False)
-    publish_date = models.DateField('date published')
-    edit_date = models.DateField('latest edit')
+    creation_stamp = models.DateTimeField('creation time')
+    publish_stamp = models.DateTimeField('publish time', null=True, default=None)
+    edit_stamp = models.DateTimeField('latest edit time')
     status = models.CharField(max_length=1, choices=STATUS)
     description = models.TextField()
     price = models.FloatField()
     property_tax = models.FloatField()
-    # id is postal code (6), date stamp (5), alphanum serial padding out to 20 chars
-    id = models.CharField(max_length=20, primary_key=True)
     property_type = models.CharField(max_length=50)
 
     # Location information
-    country = models.CharField(max_length=100, choices=COUNTRIES)
+    country = models.CharField(max_length=3, choices=COUNTRIES)
     province = models.CharField(max_length=2, choices=PROVINCES)
     region = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
@@ -51,6 +55,13 @@ class Property(models.Model):
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
 
+    def generate_id(self):
+        p_code = str(self.postal_code)
+        d_stamp = str(int(self.creation_stamp.timestamp() // 86400))  # 86400 is seconds/day
+        prefix = p_code + d_stamp
+        # TODO: get next in sequence for given prefix instead of random
+        prop_id = prefix + str(int(random.random() * 100000))
+        return prop_id
 
 class Lot(models.Model):
     # land ownership
@@ -131,6 +142,9 @@ class HouseRoom(models.Model):
     # The room is in house X
     house = models.ForeignKey(House, on_delete=models.CASCADE)
     square_meters = models.FloatField()
+    # which floor is it on? (1 is ground -1 is basement. No 0.)
+    floor = models.IntegerField()
+    # bedroom, bathroom, kitchen, storage, multi-purpose, ...
     role = models.CharField(max_length=100)
 
 
@@ -139,6 +153,9 @@ class SuiteRoom(models.Model):
     # The room is in suite X
     suite = models.ForeignKey(Suite, on_delete=models.CASCADE)
     square_meters = models.FloatField()
+    # which floor is it on? (1 is ground -1 is basement. No 0.)
+    floor = models.IntegerField()
+    # bedroom, bathroom, kitchen, storage, multi-purpose, ...
     role = models.CharField(max_length=100)
 
 

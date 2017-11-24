@@ -11,11 +11,12 @@ class HomeView(generic.ListView):
 
     def get_queryset(self):
         # The 5 most recently published properties
-        return Property.objects.order_by('-publish_date')[:5]
+        return Property.objects.order_by('-publish_stamp')[:5]
 
 
-def home(request):
-    return HttpResponse("Index page. List of recently added properties.")
+class DetailView(generic.DetailView):
+    model = Property
+    template_name = 'property/detail.html'
 
 
 def search_results(request):
@@ -24,10 +25,6 @@ def search_results(request):
 
 def search(request):
     return HttpResponse("headless. get search results")
-
-
-def details(request, property_id):
-    return HttpResponse("show details of property listing {}".format(property_id))
 
 
 def new(request):
