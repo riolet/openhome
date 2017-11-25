@@ -86,6 +86,11 @@ python manage.py createsuperuser
 # supply name, email, password
 ```
 
+Loading some test data
+```bash
+python3 manage.py loaddata property/fixtures/dev_fixture.json
+```
+
 Launch development webserver
 ```bash
 python3 manage.py runserver 

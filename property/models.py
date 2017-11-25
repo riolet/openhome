@@ -132,7 +132,7 @@ class Structure(models.Model):
     lot = models.ForeignKey(Lot, on_delete=models.CASCADE)
     square_meters = models.FloatField()
     width = models.FloatField()
-    length = models.FloatField()
+    depth = models.FloatField()
     height = models.FloatField()
     description = models.TextField()
 
