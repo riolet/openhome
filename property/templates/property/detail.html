@@ -7,5 +7,111 @@
 <body>
 <h1>Property at {{property.street_address}}</h1>
 <p>{{property.description}}</p>
+<h2>Detail</h2>
+<ul>
+  <li>Listing date: {{property.publish_stamp}}</li>
+  <li>Status: {{property.get_status_display}}</li>
+  <li>Price: {{property.price}}</li>
+  <li>Property Type: {{property.property_type}}</li>
+  <li>Property Tax (estimate): {{property.property_tax}}</li>
+  <li>Address:
+    <ul>
+      <li>{{property.street_address}}</li>
+      <li>{{property.city}}, {{property.get_province_display}}, {{property.get_country_display}}</li>
+      <li>{{property.postal_code}}</li>
+    </ul>
+  </li>
+  <li>Community: {{property.community}}</li>
+  <li>Region: {{property.region}}</li>
+  <li>GPS: {{property.latitude}}, {{property.longitude}}</li>
+</ul>
+
+{% if property.lot_set.count %}
+  <h2>Land</h2>
+  <ul>
+  {% for lot in property.lot_set.all %}
+    <li>{{forloop.counter}}. {{lot.square_meters|floatformat:"0" }}m², {{ lot.zoning }}: {{ lot.description }}</li>
+    {% if lot.structure_set.count %}
+      <li>Other structures:
+        <ul>
+          {% for structure in lot.structure_set.all %}
+            <li>{{forloop.counter}}. {{structure.width|floatformat:"-1"}}x{{structure.depth|floatformat:"-1"}}x{{structure.height|floatformat:"-1"}}m - {{structure.description}}</li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endif %}
+  {% endfor %}
+  </ul>
+{% endif %}
+{% if property.house_set.count %}
+  <h2>Houses</h2>
+  <ul>
+  {% for house in property.house_set.all %}
+    <li>{{forloop.counter}}. {{ house.square_meters|floatformat:"0" }}m², {{ house.beds }} beds, {{ house.baths|add:house.halfbaths }} baths
+      <ul>
+        <li>Year: {{house.year}}</li>
+        <li>beds: {{house.beds}}</li>
+        <li>baths: {{house.baths}}</li>
+        <li>half baths: {{house.halfbaths}}</li>
+        <li>floorspace: {{house.square_meters}}m²</li>
+        <li>floors (above ground): {{house.floors}}</li>
+        <li>basements (below ground): {{house.basements}}</li>
+        <li>garage: {{ house.get_garage_display }}</li>
+        <li>parking: {{house.parking}}</li>
+        <li>extras: {{house.extras}}</li>
+        <li>Rooms:
+          <ul>
+          {% for room in house.houseroom_set.all %}
+            <li>{{forloop.counter}}. {{room.role}} ({{room.square_meters}}m², floor {{room.floor}})</li>
+          {% endfor %}
+          </ul>
+        </li>
+      </ul>
+    </li>
+  {% endfor %}
+  </ul>
+{% endif %}
+{% if property.suite_set.count %}
+  <h2>Suites</h2>
+  <ul>
+  {% for suite in property.suite_set.all %}
+    <li>{{forloop.counter}}. {{ suite.square_meters|floatformat:"0" }}m², {{ suite.beds }} beds, {{ suite.baths|add:suite.halfbaths }} baths
+      <ul>
+        <li>Year: {{suite.year}}</li>
+        <li>Beds: {{suite.beds}}</li>
+        <li>Baths: {{suite.baths}}</li>
+        <li>Half Baths: {{suite.halfbaths}}</li>
+        <li>Floorspace: {{suite.square_meters}}m²</li>
+        <li>Floors (above ground): {{suite.floors}}</li>
+        <li>Basements (below ground): {{suite.basements}}</li>
+        <li>Garage: {{ suite.get_garage_display }}</li>
+        <li>Parking: {{suite.parking}}</li>
+        <li>Extras: {{suite.extras}}</li>
+        <li>Strata info:
+          <ul>
+            <li>Unit Number: {{suite.unit_number}}</li>
+            <li>Annual Strata Fee: {{suite.annual_strata_fee}}</li>
+            <li>Pet Rules: {{suite.pet_rules}}</li>
+            <li>Shared Fitness Room: {{suite.shared_fitness_room}}</li>
+            <li>Shared Pool: {{suite.shared_pool}}</li>
+            <li>Shared Party Room: {{suite.shared_party_room}}</li>
+            <li>Shared Private Courtyard: {{suite.shared_private_courtyard}}</li>
+            <li>Shared Laundry: {{suite.shared_laundry}}</li>
+            <li>Units in Building: {{suite.units_in_building}}</li>
+            <li>Building Floors: {{suite.building_floors}}</li>
+          </ul>
+        </li>
+        <li>Rooms:
+          <ul>
+          {% for room in suite.suiteroom_set.all %}
+            <li>{{forloop.counter}}. {{room.role}} ({{room.square_meters}}m², floor {{room.floor}})</li>
+          {% endfor %}
+          </ul>
+        </li>
+      </ul>
+    </li>
+  {% endfor %}
+  </ul>
+{% endif %}
 </body>
 </html>

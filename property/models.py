@@ -63,6 +63,7 @@ class Property(models.Model):
         prop_id = prefix + str(int(random.random() * 100000))
         return prop_id
 
+
 class Lot(models.Model):
     # land ownership
     # this lot relates to property listing X
@@ -111,8 +112,38 @@ class House(models.Model):
     extras = models.TextField()
 
 
-class Suite(House):
+class Suite(models.Model):
     # Representing condos in a city, different details than a house such as unit number, and strata fees.
+    GARAGES = (
+        ('0', 'No garage'),
+        ('1', '1-car garage'),
+        ('2', '2-car garage'),
+        ('3', '2+ car garage')
+    )
+    # this house relates to property listing X
+    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+    # year the building was constructed
+    year = models.IntegerField()
+    # rooms meant to be used as bedrooms
+    beds = models.IntegerField()
+    # toilet, sink, and tub or shower
+    baths = models.IntegerField()
+    # toilet, sink
+    halfbaths = models.IntegerField()
+    # floor space of all rooms together
+    square_meters = models.FloatField()
+    # floors or storeys. half-floors due to hills are ignored.
+    floors = models.IntegerField()
+    # basements, or floors below ground. User discretion.
+    basements = models.IntegerField()
+    # Any room you can drive a car into and close the door is a garage.
+    # assumption: there's only 1 attached garage per house.
+    garage = models.CharField(max_length=1, choices=GARAGES)
+    # Parking situation (dedicated street parking, street, underground, garage, helipad...)
+    parking = models.CharField(max_length=100)
+    # catch-all for additional features such as alarm system, fireplace, pool, sauna, etc.
+    extras = models.TextField()
+
     # room unit 221A, 4, #209, 2211B, 2-1104
     unit_number = models.CharField(max_length=10)
     annual_strata_fee = models.FloatField()
