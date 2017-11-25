@@ -11,9 +11,9 @@
 <ul>
   <li>Listing date: {{property.publish_stamp}}</li>
   <li>Status: {{property.get_status_display}}</li>
-  <li>Price: {{property.price}}</li>
+  <li>Price: ${{property.price|floatformat:"0"}}</li>
   <li>Property Type: {{property.property_type}}</li>
-  <li>Property Tax (estimate): {{property.property_tax}}</li>
+  <li>Property Tax (estimate, annual): ${{property.property_tax|floatformat:"2"}}</li>
   <li>Address:
     <ul>
       <li>{{property.street_address}}</li>
@@ -50,19 +50,19 @@
     <li>{{forloop.counter}}. {{ house.square_meters|floatformat:"0" }}m², {{ house.beds }} beds, {{ house.baths|add:house.halfbaths }} baths
       <ul>
         <li>Year: {{house.year}}</li>
-        <li>beds: {{house.beds}}</li>
-        <li>baths: {{house.baths}}</li>
-        <li>half baths: {{house.halfbaths}}</li>
-        <li>floorspace: {{house.square_meters}}m²</li>
-        <li>floors (above ground): {{house.floors}}</li>
-        <li>basements (below ground): {{house.basements}}</li>
-        <li>garage: {{ house.get_garage_display }}</li>
-        <li>parking: {{house.parking}}</li>
-        <li>extras: {{house.extras}}</li>
+        <li>Beds: {{house.beds}}</li>
+        <li>Baths: {{house.baths}}</li>
+        <li>Half baths: {{house.halfbaths}}</li>
+        <li>Floorspace: {{house.square_meters}}m²</li>
+        <li>Floors (above ground): {{house.floors}}</li>
+        <li>Basements (below ground): {{house.basements}}</li>
+        <li>Garage: {{ house.get_garage_display }}</li>
+        <li>Parking: {{house.parking}}</li>
+        <li>Extras: {{house.extras}}</li>
         <li>Rooms:
           <ul>
           {% for room in house.houseroom_set.all %}
-            <li>{{forloop.counter}}. {{room.role}} ({{room.square_meters}}m², floor {{room.floor}})</li>
+            <li>{{forloop.counter}}. {{room.role|capfirst}} ({{room.square_meters|floatformat:"-1"}}m², floor {{room.floor}})</li>
           {% endfor %}
           </ul>
         </li>
@@ -90,7 +90,7 @@
         <li>Strata info:
           <ul>
             <li>Unit Number: {{suite.unit_number}}</li>
-            <li>Annual Strata Fee: {{suite.annual_strata_fee}}</li>
+            <li>Annual Strata Fee: ${{suite.annual_strata_fee|floatformat:"2"}}</li>
             <li>Pet Rules: {{suite.pet_rules}}</li>
             <li>Shared Fitness Room: {{suite.shared_fitness_room}}</li>
             <li>Shared Pool: {{suite.shared_pool}}</li>
@@ -104,7 +104,7 @@
         <li>Rooms:
           <ul>
           {% for room in suite.suiteroom_set.all %}
-            <li>{{forloop.counter}}. {{room.role}} ({{room.square_meters}}m², floor {{room.floor}})</li>
+            <li>{{forloop.counter}}. {{room.role|capfirst}} ({{room.square_meters|floatformat:"-1"}}m², floor {{room.floor}})</li>
           {% endfor %}
           </ul>
         </li>
