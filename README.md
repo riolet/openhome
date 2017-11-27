@@ -97,3 +97,61 @@ python3 manage.py runserver
 ```
 
 Navigate to website in browser at [http://localhost:8000](http://localhost:8000)
+
+## Run with SSL
+
+install stunnel
+```bash
+sudo apt install stunnel4
+```
+
+make a folder in your project
+```bash
+cd ~/projects/openhome
+mkdir stunnel
+cd stunnel
+```
+
+make some security keys
+```bash
+openssl genrsa 1024 > stunnel.key
+openssl req -new -x509 -nodes -sha1 -days 365 -key stunnel.key > stunnel.cert
+cat stunnel.key stunnel.cert > stunnel.pem
+```
+
+Make a file called `dev_https` containing:
+```
+pid=
+
+cert = stunnel/stunnel.pem
+sslVersion = TLSv1.2
+foreground = yes
+output = stunnel.log
+
+[https]
+accept=8000
+connect=8001
+TIMEOUTclose=1
+```
+
+Navigate to your project folder (with manage.py) and make a script called `runhttps` as follows:
+```bash
+stunnel4 stunnel/dev_https &
+HTTPS=1 python manage.py runserver 8001
+```
+
+Make the script runnable and run it
+```bash
+chmod a+x runhttps
+```
+
+
+
+
+
+
+
+
+
+
+

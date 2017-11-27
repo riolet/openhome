@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from . import views
+from property import views
 
 app_name = 'property'
 
@@ -13,5 +13,5 @@ urlpatterns = [
     url(r'^listing/(?P<property_id>\w{11,20})/edit/$', views.edit, name='edit'),
     url(r'^login/$', views.login, name='login'),
     url(r'^logout/$', views.logout, name='logout'),
-    url(r'^user/(?P<user_id>\d+)/$', views.user, name='account'),
+    url(r'^account/$', views.account, name='account'),
 ]

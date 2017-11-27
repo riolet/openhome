@@ -1,0 +1,109 @@
+import oauthlib.oauth2.rfc6749.errors
+from openhome import settings
+from property.oauth_consumer import Authorization
+from django.http import HttpResponseRedirect, HttpResponseNotAllowed, HttpRequest
+from django.urls import reverse
+
+
+def login(request):
+    """
+    :type request: HttpRequest
+    """
+    print("uri: {}".format(request.build_absolute_uri()))
+    print("code: {}".format(request.GET.get('code', '')))
+    l_model = LoginView(request)
+
+    if request.method == 'POST':
+        return HttpResponseNotAllowed(['GET'])
+    else:
+        return l_model.get_method()
+
+
+def logout(request):
+    l_model = LoginView(request)
+    l_model.log_out()
+    return HttpResponseRedirect(reverse("property:home"))
+
+
+class LoginView:
+    def __init__(self, request):
+        """
+        :type request: HttpRequest
+        """
+        self.request = request
+        self.session = request.session
+        self.redirect_uri = settings.OAUTH['login_uri']
+        self.login_redirect = "https://localhost:8000/account/"
+        self.scope = settings.OAUTH['scope']
+        self.oauth = Authorization(
+            session=self.session,
+            authorization_url=settings.OAUTH['authorization_url'],
+            token_url=settings.OAUTH['token_url'],
+            client_id=settings.OAUTH['client_id'],
+            client_secret=settings.OAUTH['client_secret'],
+            default_redirect_uri=settings.OAUTH['redirect_uri'],
+            default_scope_requested=settings.OAUTH['scope'])
+
+    def get_token(self):
+        #authorization_response = "https://localhost:8000/login"
+        authorization_response = self.request.build_absolute_uri()
+        try:
+            # redirect_uri must match between get_auth_code and get_token.
+            # scope must match between get_auth_code and get_token
+            self.oauth.fetch_token(authorization_response, redirect_uri=self.redirect_uri, scope=self.scope)
+        except oauthlib.oauth2.rfc6749.errors.AccessDeniedError:
+            print("Access was denied. Reason unknown.")
+            return False
+        except oauthlib.oauth2.rfc6749.errors.InvalidGrantError:
+            print("Access was denied. Error: Invalid Grant.")
+            return False
+        return True
+
+    def get_auth_code(self):
+        # redirect_uri must match between get_auth_code and get_token.
+        # scope must match between get_auth_code and get_token
+        authorization_url = self.oauth.get_auth_url(redirect_uri=self.redirect_uri, scope=self.scope)
+        return HttpResponseRedirect(authorization_url)
+
+    def request_login_info(self):
+        data = self.oauth.request(settings.OAUTH["resource"])
+        return data
+
+    def log_in(self):
+        login_info = self.request_login_info()
+        self.session['logged_in'] = True
+        import pprint
+        print("login_info")
+        pprint.pprint(login_info)
+        print("end login_info")
+        self.session['login_email'] = login_info['user']['email']
+
+    def log_out(self):
+        self.session.flush()
+
+    def get_method(self):
+        data = self.request.GET
+        if 'login_redirect' in data:
+            self.login_redirect = data['login_redirect']
+            # save for the return trip
+            self.session['login_redirect'] = self.login_redirect
+
+        if 'state' in data and 'code' in data:
+            if self.get_token():
+                self.log_in()
+                return HttpResponseRedirect(self.login_redirect)
+            else:
+                self.log_out()
+                return HttpResponseRedirect(self.login_redirect)
+        elif 'error' in data:
+            print("Error response.\n\t{0}".format(data['error']))
+            if 'error_description' in data:
+                print("\t{0}".format(data['error_description']))
+            # TODO: have destination page indicate to user that an error has occurred.
+            return HttpResponseRedirect(reverse("property:home"))
+        else:
+            print("begin authentication process.")
+            return self.get_auth_code()
+
+        # this code should be unreachable.
+        return HttpResponseRedirect(reverse("property:home"))

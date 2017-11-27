@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views import generic
+from .login import login, logout
 
 from .models import Property
 
@@ -43,16 +44,13 @@ def edit(request, property_id):
         return HttpResponse("Getting form to edit property listing {}".format(property_id))
 
 
-def login(request):
-    return HttpResponse("Login via rioauth (opt. via google or github)")
+def account(request):
+    if request.session.get('logged_in', False) is not True:
+        return HttpResponse('User is not logged in. <a href="/login/">login</a>')
 
-
-def logout(request):
-    return HttpResponse("headless. logout and redirect to home")
-
-
-def user(request, user_id):
+    # user IS logged in.
+    user_id = request.session.get('login_email', 'NO@EMAIL.COM')
     if request.method == 'POST':
-        return HttpResponse("Update user {} information in database".format(user_id))
+        return HttpResponse("Logged in. Update user {} information in database".format(user_id))
     else:
-        return HttpResponse("Show/edit contact info for user {}'s listed properties.".format(user_id))
+        return HttpResponse("Logged in. Show/edit contact info for user {}'s listed properties.".format(user_id))

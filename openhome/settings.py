@@ -120,6 +120,17 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+OAUTH = {
+    'client_id': '',
+    'client_secret': '',
+    'authorization_url': 'https://auth.riolet.com/authorize',
+    'token_url': 'https://auth.riolet.com/token',
+    'resource': 'https://auth.riolet.com/resource',
+    'scope': 'read write',
+    'redirect_uri': 'https://localhost:8000/login',
+    'login_uri': 'https://localhost:8000/login',
+}
+
 try:
     from .local_settings import *
 except:
