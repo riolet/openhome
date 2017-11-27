@@ -2,6 +2,23 @@ import random
 from django.db import models
 
 
+class User(models.Model):
+    #Any contact information needed to let buyer reach seller. Minimum is email.
+    login_email = models.CharField("Login", max_length=100, null=False, blank=False, primary_key=True)
+    email = models.CharField("Email address", max_length=100, null=True, blank=True)
+    phone = models.CharField("Phone number", max_length=100, null=True, blank=True)
+    fax = models.CharField("Fax number", max_length=100, null=True, blank=True)
+    mail = models.CharField("Mailing address", max_length=200, null=True, blank=True)
+    message = models.TextField(null=True, blank=True)
+    b_email = models.BooleanField("Show email", default=True)
+    b_phone = models.BooleanField("Show phone number", default=False)
+    b_fax = models.BooleanField("Show fax", default=False)
+    b_mail = models.BooleanField("Show mailing address", default=False)
+
+    def __str__(self):
+        return self.login_email
+
+
 class Property(models.Model):
     STATUS = (
         ('U', 'Unpublished'),
@@ -33,7 +50,7 @@ class Property(models.Model):
     # id postal code (6), date stamp (5), alphanum serial padding out to 20 chars
     id = models.CharField(max_length=20, primary_key=True)
 
-    # owner = models.ForeignKey(Users, on_delete=models.SET_NULL)
+    owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     creation_stamp = models.DateTimeField('creation time')
     publish_stamp = models.DateTimeField('publish time', null=True, default=None)
     edit_stamp = models.DateTimeField('latest edit time')
@@ -63,6 +80,9 @@ class Property(models.Model):
         prop_id = prefix + str(int(random.random() * 100000))
         return prop_id
 
+    def __str__(self):
+        return self.id
+
 
 class Lot(models.Model):
     # land ownership
@@ -77,6 +97,9 @@ class Lot(models.Model):
     depth = models.FloatField()
     description = models.TextField()
     zoning = models.CharField(max_length=100, default="residential")
+
+    def __str__(self):
+        return "{}sqm in {}".format(self.square_meters, self.property)
 
 
 class House(models.Model):
@@ -110,6 +133,9 @@ class House(models.Model):
     parking = models.CharField(max_length=100)
     # catch-all for additional features such as alarm system, fireplace, pool, sauna, etc.
     extras = models.TextField()
+
+    def __str__(self):
+        return "{}-bed, {}-storey house".format(self.beds, self.floors)
 
 
 class Suite(models.Model):
@@ -156,6 +182,9 @@ class Suite(models.Model):
     units_in_building = models.IntegerField()
     building_floors = models.IntegerField()
 
+    def __str__(self):
+        return "{}-bed, {}-sqm suite".format(self.beds, self.square_meters)
+
 
 class Structure(models.Model):
     # Structures other than the primary residence on the same lot. May already be leased out.
@@ -166,6 +195,9 @@ class Structure(models.Model):
     depth = models.FloatField()
     height = models.FloatField()
     description = models.TextField()
+
+    def __str__(self):
+        return "{:.3g}x{:.3g}x{:.3g} structure".format(self.width, self.depth, self.height)
 
 
 class HouseRoom(models.Model):
@@ -178,6 +210,9 @@ class HouseRoom(models.Model):
     # bedroom, bathroom, kitchen, storage, multi-purpose, ...
     role = models.CharField(max_length=100)
 
+    def __str__(self):
+        return "{}sqm {}".format(self.square_meters, self.role[:20])
+
 
 class SuiteRoom(models.Model):
     # describing rooms in the suite
@@ -188,6 +223,9 @@ class SuiteRoom(models.Model):
     floor = models.IntegerField()
     # bedroom, bathroom, kitchen, storage, multi-purpose, ...
     role = models.CharField(max_length=100)
+
+    def __str__(self):
+        return "{}sqm {}".format(self.square_meters, self.role[:20])
 
 
 

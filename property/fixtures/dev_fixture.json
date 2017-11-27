@@ -1,8 +1,39 @@
 [
   {
+    "model": "property.user",
+    "pk": "adam@example.com",
+    "fields": {
+      "email": "inquiries@example.com",
+      "phone": "604-715-8266",
+      "fax": "604-715-8267",
+      "mail": "633 Front St, Vancouver BC, V5F 3D6",
+      "message": "Send an email and I'll get back to you within 2 business days, or call between 9 and 5 during the week.",
+      "b_email": true,
+      "b_phone": true,
+      "b_fax": true,
+      "b_mail": true
+    }
+  },
+  {
+    "model": "property.user",
+    "pk": "bailey@example.com",
+    "fields": {
+      "email": "bailey@example.com",
+      "phone": "250-331-6419",
+      "fax": "",
+      "mail": null,
+      "message": "",
+      "b_email": true,
+      "b_phone": false,
+      "b_fax": false,
+      "b_mail": true
+    }
+  },
+  {
     "model": "property.property",
     "pk": "V2J2Y917494000000001",
     "fields": {
+      "owner": "adam@example.com",
       "creation_stamp": "2017-11-24 22:16:28+00:00",
       "publish_stamp": null,
       "edit_stamp": "2017-11-24 22:16:28+00:00",
@@ -26,6 +57,7 @@
     "model": "property.property",
     "pk": "V2J2Y917494000000002",
     "fields": {
+      "owner": "bailey@example.com",
       "creation_stamp": "2017-11-24 22:26:28+00:00",
       "publish_stamp": null,
       "edit_stamp": "2017-11-24 22:26:28+00:00",
@@ -49,6 +81,7 @@
     "model": "property.property",
     "pk": "V2J2Y917494000000003",
     "fields": {
+      "owner": "adam@example.com",
       "creation_stamp": "2017-11-24 22:36:28+00:00",
       "publish_stamp": null,
       "edit_stamp": "2017-11-24 22:36:28+00:00",
@@ -72,6 +105,7 @@
     "model": "property.property",
     "pk": "V2J2Y917494000000004",
     "fields": {
+      "owner": "bailey@example.com",
       "creation_stamp": "2017-11-24 22:46:28+00:00",
       "publish_stamp": null,
       "edit_stamp": "2017-11-24 22:46:28+00:00",
@@ -95,6 +129,7 @@
     "model": "property.property",
     "pk": "V2J2Y917494000000005",
     "fields": {
+      "owner": "adam@example.com",
       "creation_stamp": "2017-11-24 22:56:28+00:00",
       "publish_stamp": null,
       "edit_stamp": "2017-11-24 22:56:28+00:00",
