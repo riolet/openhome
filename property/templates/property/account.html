@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Account for {{user.login_email}}</title>
+</head>
+<body>
+<h1>Account holder: {{user.login_email}}</h1>
+{% if error_message %}<p><b>{{ error_message }}</b></p>{% endif %}
+{% if info_message %}<p><i>{{ info_message }}</i></p>{% endif %}
+<h2>Contact Info (shown on listings)</h2>
+<form id="edit_user" action="{% url 'property:account' %}" method="post">
+{% csrf_token %}
+  <input type="checkbox" name="b_email" id="b_email" {% if user.b_email %}checked {% endif %} />
+  <label for="b_email">Show Email Address</label>
+  <input type="text" name="email" id="email" value="{{user.email}}" placeholder="contact email"/>
+  <br />
+
+  <input type="checkbox" name="b_phone" id="b_phone" {% if user.b_phone %}checked {% endif %}/>
+  <label for="b_phone">Show Phone Number</label>
+  <input type="text" name="phone" id="phone" value="{{user.phone}}" placeholder="contact phone"/>
+  <br />
+
+  <input type="checkbox" name="b_fax" id="b_fax" {% if user.b_fax %}checked {% endif %}/>
+  <label for="b_fax">Show Fax Number</label>
+  <input type="text" name="fax" id="fax" value="{{user.fax}}" placeholder="contact fax"/>
+  <br />
+
+  <input type="checkbox" name="b_mail" id="b_mail" {% if user.b_mail %}checked {% endif %}/>
+  <label for="b_mail">Show Mailing Address</label>
+  <input type="text" name="mail" id="mail" value="{{user.mail}}" placeholder="contact mail"/>
+  <br />
+
+  <label for="b_mail">Message (optional):</label>
+  <br />
+  <textarea name="message" id="message" rows=3 cols=50 form="edit_user">{{user.message}}</textarea>
+  <br />
+<input type="submit" value="Save Changes" />
+</form>
+</body>
+</html>

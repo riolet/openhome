@@ -91,7 +91,6 @@ class Authorization(object):
 
         response = oauth.get(protected_url, verify=True)
         try:
-            #str_response = response.content.decode('utf-8')
             str_response = response.content.decode('utf-8')
             decoded_response = json.loads(str_response)
         except ValueError:

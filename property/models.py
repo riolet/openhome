@@ -5,15 +5,16 @@ from django.db import models
 class User(models.Model):
     #Any contact information needed to let buyer reach seller. Minimum is email.
     login_email = models.CharField("Login", max_length=100, null=False, blank=False, primary_key=True)
-    email = models.CharField("Email address", max_length=100, null=True, blank=True)
-    phone = models.CharField("Phone number", max_length=100, null=True, blank=True)
-    fax = models.CharField("Fax number", max_length=100, null=True, blank=True)
-    mail = models.CharField("Mailing address", max_length=200, null=True, blank=True)
-    message = models.TextField(null=True, blank=True)
+    email = models.CharField("Email address", max_length=100, null=False, blank=True)
+    phone = models.CharField("Phone number", max_length=100, null=False, blank=True)
+    fax = models.CharField("Fax number", max_length=100, null=False, blank=True)
+    mail = models.CharField("Mailing address", max_length=200, null=False, blank=True)
+    message = models.TextField(null=False, blank=True)
     b_email = models.BooleanField("Show email", default=True)
     b_phone = models.BooleanField("Show phone number", default=False)
     b_fax = models.BooleanField("Show fax", default=False)
     b_mail = models.BooleanField("Show mailing address", default=False)
+    last_login = models.DateTimeField("Last Login", null=False)
 
     def __str__(self):
         return self.login_email

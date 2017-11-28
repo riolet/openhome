@@ -3,14 +3,15 @@ from openhome import settings
 from property.oauth_consumer import Authorization
 from django.http import HttpResponseRedirect, HttpResponseNotAllowed, HttpRequest
 from django.urls import reverse
+from django.utils import timezone
+
+from .models import User
 
 
 def login(request):
     """
     :type request: HttpRequest
     """
-    print("uri: {}".format(request.build_absolute_uri()))
-    print("code: {}".format(request.GET.get('code', '')))
     l_model = LoginView(request)
 
     if request.method == 'POST':
@@ -33,7 +34,7 @@ class LoginView:
         self.request = request
         self.session = request.session
         self.redirect_uri = settings.OAUTH['login_uri']
-        self.login_redirect = "https://localhost:8000/account/"
+        self.login_redirect = reverse("property:account")
         self.scope = settings.OAUTH['scope']
         self.oauth = Authorization(
             session=self.session,
@@ -45,7 +46,6 @@ class LoginView:
             default_scope_requested=settings.OAUTH['scope'])
 
     def get_token(self):
-        #authorization_response = "https://localhost:8000/login"
         authorization_response = self.request.build_absolute_uri()
         try:
             # redirect_uri must match between get_auth_code and get_token.
@@ -66,17 +66,45 @@ class LoginView:
         return HttpResponseRedirect(authorization_url)
 
     def request_login_info(self):
+        """
+        returned data will resemble this:
+        {'user': {
+            'last_access': 1506375126,
+            'id': 2,
+            'email': 'joe.pelz@riolet.com',
+            'name': 'Joe',
+            'groups': 'read write'
+         },
+         'subscription': {
+            'subscription_type': 'Basic',
+            'status': 'active',
+            'subscription_id': 5,
+            'user_id': 2,
+            'app_id': 'abc123'
+         },
+         'status': 'success'
+        }
+        """
+
         data = self.oauth.request(settings.OAUTH["resource"])
         return data
 
     def log_in(self):
         login_info = self.request_login_info()
         self.session['logged_in'] = True
-        import pprint
-        print("login_info")
-        pprint.pprint(login_info)
-        print("end login_info")
-        self.session['login_email'] = login_info['user']['email']
+        account = login_info['user']['email']
+        self.session['login_email'] = account
+
+        try:
+            user = User.objects.get(pk=account)
+            user.last_login = timezone.now()
+        except User.DoesNotExist:
+            user = User(
+                login_email=account,
+                email=account,
+                last_login=timezone.now()
+            )
+        user.save()
 
     def log_out(self):
         self.session.flush()
@@ -102,7 +130,6 @@ class LoginView:
             # TODO: have destination page indicate to user that an error has occurred.
             return HttpResponseRedirect(reverse("property:home"))
         else:
-            print("begin authentication process.")
             return self.get_auth_code()
 
         # this code should be unreachable.
