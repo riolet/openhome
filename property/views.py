@@ -1,6 +1,6 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, reverse
 from django.views import generic
 from .login import login, logout
 
@@ -30,10 +30,17 @@ def search(request):
 
 
 def new(request):
+    user_id = request.session.get('login_email', '')
+    user = get_object_or_404(User, pk=user_id.lower())
+
     if request.method == 'POST':
-        return HttpResponse("create new property listing in database")
+        # create property object.
+        # save listing id
+        p = Property()
+        p.id = 'V2J2Y917494000000001'
+        return HttpResponseRedirect(reverse('property:detail', args=(p.id,)))
     else:
-        return HttpResponse("form to create new property listing")
+        return render(request, 'property/new.html', {'user': user})
 
 
 def edit(request, property_id):
@@ -55,7 +62,7 @@ def account(request):
         return HttpResponse('User is not logged in. <a href="/login/">login</a>')
 
     # user IS logged in.
-    user_id = request.session.get('login_email', 'NO@EMAIL.COM')
+    user_id = request.session.get('login_email', '')
     user = get_object_or_404(User, pk=user_id.lower())
     if request.method == 'POST':
         new_email = request.POST.get('email', user.email)

@@ -5,13 +5,13 @@
   <title>Home</title>
 </head>
 <body>
-<h1>Properties</h1>
 {% if request.session.logged_in %}
-Logged in as {{ request.session.login_email }}
-<a href="{% url 'property:logout' %}">(Log out)</a>
+<p>Logged in as {{ request.session.login_email }} <a href="{% url 'property:logout' %}">(Log out)</a></p>
+<p><a href="{% url 'property:new' %}">Create a New Listing</a></p>
 {% else %}
 <a href="{% url 'property:login' %}?login_redirect={% url 'property:home' %}">Log in</a>
 {% endif %}
+<h1>Properties</h1>
 {% if latest_property_list %}
     <ul>
     {% for property in latest_property_list %}
