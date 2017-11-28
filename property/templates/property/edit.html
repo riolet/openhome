@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<h1>Property at {{property.street_address}}</h1>
+<p>{{property.description}}</p>
+<h2>Detail</h2>
+{% if errors %}
+<h2>Errors in your submission:</h2>
+<ul>
+{% for key, value in errors.items %}
+  <li>{{key}}: {{value}}</li>
+{% endfor %}
+</ul>
+{% endif %}
+<form id="edit_property" action="{% url 'property:edit' property.id %}" method="post">
+{% csrf_token %}
+  <!--price -->
+  <label for="price">Price</label>
+  <input name="price" id="price" type="number" placeholder="400,000.00" min="0" step="0.01" value="{{property.price}}" required />
+  <br />
+
+  <fieldset>
+    <legend>Address</legend>
+    <!--country-->
+    <label for="country">Country:</label>
+    <select form="new_property" name="country" id="country" required>
+    {% for n, country in country_choices %}
+      {% if n == property.country|default:"CAN" %}
+      <option value="{{n}}" selected>{{country}}</option>
+      {% else %}
+      <option value="{{n}}">{{country}}</option>
+      {% endif %}
+    {% endfor %}
+    </select>
+    <br />
+
+    <!--province-->
+    <label for="province">Province:</label>
+    <select form="new_property" name="province" id="province" required>
+    {% for n, province in province_choices %}
+      {% if n == property.province|default:"BC" %}
+      <option value="{{n}}" selected>{{province}}</option>
+      {% else %}
+      <option value="{{n}}">{{province}}</option>
+      {% endif %}
+    {% endfor %}
+    </select>
+    <br />
+
+    <!--region-->
+    <label for="region">Region:</label>
+    <input name="region" id="region" type="text" placeholder="Fraser Valley" value="{{property.region}}"/>
+    <br />
+
+    <!--city-->
+    <label for="city">City:</label>
+    <input name="city" id="city" type="text" placeholder="Abbotsford" value="{{property.city}}" required />
+    <br />
+
+    <!--community-->
+    <label for="neighborhood">Neighborhood:</label>
+    <input name="neighborhood" id="neighborhood" type="text" placeholder="Straiton Bowl" value="{{property.neighborhood}}" />
+    <br />
+
+    <!--street_address-->
+    <label for="street_address">Street Address:</label>
+    <input name="street_address" id="street_address" type="text" placeholder="123 Farina Rd" value="{{property.street_address}}" required />
+    <br />
+
+    <!--postal_code-->
+    <label for="postal_code">Postal Code:</label>
+    <input name="postal_code" id="postal_code" type="text" placeholder="V3G 1R4" value="{{property.postal_code}}" />
+    <br />
+
+    <!--latitude and longitude-->
+    <label for="latitude">Latitude & Longitude (optional, for more accurate pin):</label>
+    <br />
+    <input name="latitude" id="latitude" type="number" placeholder="49.082682" value="{{property.latitude}}" />
+    <input name="longitude" id="longitude" type="number" placeholder="-122.210422" value="{{property.longitude}}" />
+    <br />
+  </fieldset>
+
+  <!--property_type-->
+  <label for="property_type">Property Type (detached, townhouse, etc):</label>
+  <input name="property_type" id="property_type" list="ptype" value="{{property.property_type}}" required>
+  <datalist id="ptype">
+    <option value="Detached">
+    <option value="Semi-Detached">
+    <option value="Duplex">
+    <option value="Townhouse">
+    <option value="Lot">
+    <option value="Condominium">
+    <option value="Safari">
+  </datalist>
+  <br />
+
+  <!--property_tax-->
+  <label for="property_tax">Property Tax (annual, estimate):</label>
+  <input name="property_tax" id="property_tax" type="number" placeholder="4,000.00" min="0" step="0.01" value="{{property.property_tax}}" required />
+  <br />
+
+  <!--description [textarea]-->
+  <label for="description">Description of property:</label>
+  <br />
+  <textarea name="description" id="description" rows=5 cols=70 form="new_property" required>{{property.description}}</textarea>
+  <br />
+  <input type="submit" value="Save" />
+</form>
+
+
+<!-- Land Information -->
+
+<h2>Land</h2>
+{% if property.lot_set.count %}
+  <ul>
+  {% for lot in property.lot_set.all %}
+    <li>{{forloop.counter}}. {{lot.square_meters|floatformat:"0" }}m², {{ lot.zoning }}: {{ lot.description }}</li>
+    {% if lot.structure_set.count %}
+      <li>Other structures:
+        <ul>
+          {% for structure in lot.structure_set.all %}
+            <li>{{forloop.counter}}. {{structure.width|floatformat:"-1"}}x{{structure.depth|floatformat:"-1"}}x{{structure.height|floatformat:"-1"}}m - {{structure.description}}</li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endif %}
+  {% endfor %}
+  </ul>
+{% else %}
+<p>No lots listed</p>
+{% endif %}
+
+
+<!-- House Information -->
+
+<h2>Houses</h2>
+{% if property.house_set.count %}
+  <ul>
+  {% for house in property.house_set.all %}
+    <li>{{forloop.counter}}. {{ house.square_meters|floatformat:"0" }}m², {{ house.beds }} beds, {{ house.baths|add:house.halfbaths }} baths
+      <ul>
+        <li>Year: {{house.year}}</li>
+        <li>Beds: {{house.beds}}</li>
+        <li>Baths: {{house.baths}}</li>
+        <li>Half baths: {{house.halfbaths}}</li>
+        <li>Floorspace: {{house.square_meters}}m²</li>
+        <li>Floors (above ground): {{house.floors}}</li>
+        <li>Basements (below ground): {{house.basements}}</li>
+        <li>Garage: {{ house.get_garage_display }}</li>
+        <li>Parking: {{house.parking}}</li>
+        <li>Extras: {{house.extras}}</li>
+        <li>Rooms:
+          <ul>
+          {% for room in house.houseroom_set.all %}
+            <li>{{forloop.counter}}. {{room.role|capfirst}} ({{room.square_meters|floatformat:"-1"}}m², floor {{room.floor}})</li>
+          {% endfor %}
+          </ul>
+        </li>
+      </ul>
+    </li>
+  {% endfor %}
+  </ul>
+{% else %}
+<p>No houses listed</p>
+{% endif %}
+
+
+<!-- Suite information -->
+
+
+{% if property.suite_set.count %}
+  <h2>Suites</h2>
+  <ul>
+  {% for suite in property.suite_set.all %}
+    <li>{{forloop.counter}}. {{ suite.square_meters|floatformat:"0" }}m², {{ suite.beds }} beds, {{ suite.baths|add:suite.halfbaths }} baths
+      <ul>
+        <li>Year: {{suite.year}}</li>
+        <li>Beds: {{suite.beds}}</li>
+        <li>Baths: {{suite.baths}}</li>
+        <li>Half Baths: {{suite.halfbaths}}</li>
+        <li>Floorspace: {{suite.square_meters}}m²</li>
+        <li>Floors (above ground): {{suite.floors}}</li>
+        <li>Basements (below ground): {{suite.basements}}</li>
+        <li>Garage: {{ suite.get_garage_display }}</li>
+        <li>Parking: {{suite.parking}}</li>
+        <li>Extras: {{suite.extras}}</li>
+        <li>Strata info:
+          <ul>
+            <li>Unit Number: {{suite.unit_number}}</li>
+            <li>Annual Strata Fee: ${{suite.annual_strata_fee|floatformat:"2"}}</li>
+            <li>Pet Rules: {{suite.pet_rules}}</li>
+            <li>Shared Fitness Room: {{suite.shared_fitness_room}}</li>
+            <li>Shared Pool: {{suite.shared_pool}}</li>
+            <li>Shared Party Room: {{suite.shared_party_room}}</li>
+            <li>Shared Private Courtyard: {{suite.shared_private_courtyard}}</li>
+            <li>Shared Laundry: {{suite.shared_laundry}}</li>
+            <li>Units in Building: {{suite.units_in_building}}</li>
+            <li>Building Floors: {{suite.building_floors}}</li>
+          </ul>
+        </li>
+        <li>Rooms:
+          <ul>
+          {% for room in suite.suiteroom_set.all %}
+            <li>{{forloop.counter}}. {{room.role|capfirst}} ({{room.square_meters|floatformat:"-1"}}m², floor {{room.floor}})</li>
+          {% endfor %}
+          </ul>
+        </li>
+      </ul>
+    </li>
+  {% endfor %}
+  </ul>
+{% else %}
+<p>No suites listed</p>
+{% endif %}
+
+
+<!-- Seller's Contact Info -->
+
+<h2>Seller's Contact Info: (<a href="{% url 'property:account' %}">edit</a>)</h2>
+{{ property.owner.message }}
+<ul>
+{% if property.owner.b_email and property.owner.email %}
+  <li>Email Address: {{property.owner.email}}</li>
+{% endif %}
+{% if property.owner.b_phone and property.owner.phone %}
+  <li>Phone Number: {{property.owner.phone}}</li>
+{% endif %}
+{% if property.owner.b_fax and property.owner.fax %}
+  <li>Fax Number: {{property.owner.fax}}</li>
+{% endif %}
+{% if property.owner.b_mail and property.owner.mail %}
+  <li>Mailing Address: {{property.owner.mail}}</li>
+{% endif %}
+</ul>
+</body>
+</html>

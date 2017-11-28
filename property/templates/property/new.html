@@ -16,20 +16,7 @@
 {% endif %}
 <form id="new_property" action="{% url 'property:new' %}" method="post">
 {% csrf_token %}
-  <!--status [select]
-  <label for="status">Initial Status</label>
-  <select form="new_property" name="status" id="status" required>
-  {% for n, status in status_choices %}
-    {% if n == "U" %}
-    <option value="{{n}}" selected>{{status}}</option>
-    {% else %}
-    <option value="{{n}}">{{status}}</option>
-    {% endif %}
-  {% endfor %}
-  </select>
-  <br />
-  -->
-  <!--price [type=number]-->
+  <!--price -->
   <label for="price">Price</label>
   <input name="price" id="price" type="number" placeholder="400,000.00" min="0" step="0.01" value="{{property.price}}" required />
   <br />
