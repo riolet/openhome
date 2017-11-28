@@ -34,7 +34,7 @@ class LoginView:
         self.request = request
         self.session = request.session
         self.redirect_uri = settings.OAUTH['login_uri']
-        self.login_redirect = reverse("property:account")
+        self.login_redirect = self.session.get("login_redirect", reverse("property:account"))
         self.scope = settings.OAUTH['scope']
         self.oauth = Authorization(
             session=self.session,
