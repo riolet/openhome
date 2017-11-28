@@ -96,11 +96,11 @@ class LoginView:
         self.session['login_email'] = account
 
         try:
-            user = User.objects.get(pk=account)
+            user = User.objects.get(pk=account.lower())
             user.last_login = timezone.now()
         except User.DoesNotExist:
             user = User(
-                login_email=account,
+                login_email=account.lower(),
                 email=account,
                 last_login=timezone.now()
             )

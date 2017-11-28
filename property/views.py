@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from .login import login, logout
@@ -12,7 +13,7 @@ class HomeView(generic.ListView):
 
     def get_queryset(self):
         # The 5 most recently published properties
-        return Property.objects.order_by('-publish_stamp')[:5]
+        return Property.objects.order_by('-publish_stamp').filter(Q(status='A') | Q(status='P'))[:5]
 
 
 class DetailView(generic.DetailView):
@@ -55,11 +56,8 @@ def account(request):
 
     # user IS logged in.
     user_id = request.session.get('login_email', 'NO@EMAIL.COM')
-    user = get_object_or_404(User, pk=user_id)
+    user = get_object_or_404(User, pk=user_id.lower())
     if request.method == 'POST':
-        import pprint
-        print("post data:")
-        pprint.pprint(request.POST)
         new_email = request.POST.get('email', user.email)
         new_phone = request.POST.get('phone', user.phone)
         new_fax = request.POST.get('fax', user.fax)

@@ -37,5 +37,18 @@
   <br />
 <input type="submit" value="Save Changes" />
 </form>
+
+<h2>Properties listed:</h2>
+{% if user.property_set.count %}
+  <ul>
+  {% for property in user.property_set.all %}
+    <li><a href="{% url 'property:detail' property.id %}">${{ property.price|floatformat:"0" }} - {{ property.property_type|capfirst }} in {{ property.city }}, {{ property.province }}</a> - {{ property.description|truncatechars:40 }} <a href="{% url 'property:edit' property.id %}">Edit</a></li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <p>No properties listed yet.</p>
+{% endif %}
+<p><a href="{% url 'property:new' %}">Create a new listing</a>.</p>
+
 </body>
 </html>
