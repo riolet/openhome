@@ -1,7 +1,9 @@
 from django.http import HttpResponse, HttpResponseRedirect
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, reverse
 from django.views import generic
+from django.utils import timezone
 from .login import login, logout
 
 from .models import Property, User
@@ -34,13 +36,69 @@ def new(request):
     user = get_object_or_404(User, pk=user_id.lower())
 
     if request.method == 'POST':
-        # create property object.
-        # save listing id
-        p = Property()
-        p.id = 'V2J2Y917494000000001'
-        return HttpResponseRedirect(reverse('property:detail', args=(p.id,)))
+        import pprint
+        pprint.pprint(dict(request.POST))
+
+        description = request.POST.get('description', '')
+        price = request.POST.get('price', '1')
+        property_tax = request.POST.get('property_tax', '1')
+        property_type = request.POST.get('property_type', '')
+        country = request.POST.get('country', 'CAN')
+        province = request.POST.get('province', 'BC')
+        region = request.POST.get('region', '')
+        city = request.POST.get('city', '')
+        neighborhood = request.POST.get('neighborhood', '')
+        street_address = request.POST.get('street_address', '')
+        postal_code = request.POST.get('postal_code', '')
+        latitude = request.POST.get('latitude', '')
+        longitude = request.POST.get('longitude', '')
+
+        # validate all inputs
+
+        p = Property(
+            owner=user,
+            creation_stamp=timezone.now(),
+            publish_stamp=None,
+            edit_stamp=timezone.now(),
+            status='U',
+            description=description,
+            price=price,
+            property_tax=property_tax,
+            property_type=property_type,
+            country=country,
+            province=province,
+            region=region,
+            city=city,
+            neighborhood=neighborhood,
+            street_address=street_address,
+            postal_code=postal_code,
+            latitude=latitude,
+            longitude=longitude
+        )
+
+        p.normalize_fields()
+        p.escape_fields()
+        try:
+            p.full_clean(exclude=['id'])
+        except ValidationError as e:
+            return render(request, 'property/new.html', {
+                'user': user,
+                'country_choices': Property.COUNTRIES,
+                'status_choices': Property.STATUS,
+                'province_choices': Property.PROVINCES,
+                'errors': e.message_dict,
+                'property': p
+            })
+        p.id = p.generate_id()
+        p.save()
+        return HttpResponseRedirect(reverse('property:edit', args=(p.id,)))
     else:
-        return render(request, 'property/new.html', {'user': user})
+        return render(request, 'property/new.html', {
+            'user': user,
+            'country_choices': Property.COUNTRIES,
+            'status_choices': Property.STATUS,
+            'province_choices': Property.PROVINCES,
+        })
 
 
 def edit(request, property_id):

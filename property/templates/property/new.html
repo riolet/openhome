@@ -5,7 +5,122 @@
   <title>New Listing</title>
 </head>
 <body>
-<p>Form to create new property listing</p>
-<p>Logged in as {{user.login_email}}</p>
+<h1>New Property Listing</h1>
+{% if errors %}
+<h2>Errors in your submission:</h2>
+<ul>
+{% for key, value in errors.items %}
+  <li>{{key}}: {{value}}</li>
+{% endfor %}
+</ul>
+{% endif %}
+<form id="new_property" action="{% url 'property:new' %}" method="post">
+{% csrf_token %}
+  <!--status [select]
+  <label for="status">Initial Status</label>
+  <select form="new_property" name="status" id="status" required>
+  {% for n, status in status_choices %}
+    {% if n == "U" %}
+    <option value="{{n}}" selected>{{status}}</option>
+    {% else %}
+    <option value="{{n}}">{{status}}</option>
+    {% endif %}
+  {% endfor %}
+  </select>
+  <br />
+  -->
+  <!--price [type=number]-->
+  <label for="price">Price</label>
+  <input name="price" id="price" type="number" placeholder="400,000.00" min="0" step="0.01" value="{{property.price}}" required />
+  <br />
+
+  <fieldset>
+    <legend>Address</legend>
+    <!--country-->
+    <label for="country">Country:</label>
+    <select form="new_property" name="country" id="country" required>
+    {% for n, country in country_choices %}
+      {% if n == property.country|default:"CAN" %}
+      <option value="{{n}}" selected>{{country}}</option>
+      {% else %}
+      <option value="{{n}}">{{country}}</option>
+      {% endif %}
+    {% endfor %}
+    </select>
+    <br />
+
+    <!--province-->
+    <label for="province">Province:</label>
+    <select form="new_property" name="province" id="province" required>
+    {% for n, province in province_choices %}
+      {% if n == property.province|default:"BC" %}
+      <option value="{{n}}" selected>{{province}}</option>
+      {% else %}
+      <option value="{{n}}">{{province}}</option>
+      {% endif %}
+    {% endfor %}
+    </select>
+    <br />
+
+    <!--region-->
+    <label for="region">Region:</label>
+    <input name="region" id="region" type="text" placeholder="Fraser Valley" value="{{property.region}}"/>
+    <br />
+
+    <!--city-->
+    <label for="city">City:</label>
+    <input name="city" id="city" type="text" placeholder="Abbotsford" value="{{property.city}}" required />
+    <br />
+
+    <!--community-->
+    <label for="neighborhood">Neighborhood:</label>
+    <input name="neighborhood" id="neighborhood" type="text" placeholder="Straiton Bowl" value="{{property.neighborhood}}" />
+    <br />
+
+    <!--street_address-->
+    <label for="street_address">Street Address:</label>
+    <input name="street_address" id="street_address" type="text" placeholder="123 Farina Rd" value="{{property.street_address}}" required />
+    <br />
+
+    <!--postal_code-->
+    <label for="postal_code">Postal Code:</label>
+    <input name="postal_code" id="postal_code" type="text" placeholder="V3G 1R4" value="{{property.postal_code}}" />
+    <br />
+
+    <!--latitude and longitude-->
+    <label for="latitude">Latitude & Longitude (optional, for more accurate pin):</label>
+    <br />
+    <input name="latitude" id="latitude" type="number" placeholder="49.082682" value="{{property.latitude}}" />
+    <input name="longitude" id="longitude" type="number" placeholder="-122.210422" value="{{property.longitude}}" />
+    <br />
+  </fieldset>
+
+  <!--property_type-->
+  <label for="property_type">Property Type (detached, townhouse, etc):</label>
+  <input name="property_type" id="property_type" list="ptype" value="{{property.property_type}}" required>
+  <datalist id="ptype">
+    <option value="Detached">
+    <option value="Semi-Detached">
+    <option value="Duplex">
+    <option value="Townhouse">
+    <option value="Lot">
+    <option value="Condominium">
+    <option value="Safari">
+  </datalist>
+  <br />
+
+  <!--property_tax-->
+  <label for="property_tax">Property Tax (annual, estimate):</label>
+  <input name="property_tax" id="property_tax" type="number" placeholder="4,000.00" min="0" step="0.01" value="{{property.property_tax}}" required />
+  <br />
+
+  <!--description [textarea]-->
+  <label for="description">Description of property:</label>
+  <br />
+  <textarea name="description" id="description" rows=5 cols=70 form="new_property" required>{{property.description}}</textarea>
+  <br />
+
+  <input type="submit" value="Next..." />
+</form>
 </body>
 </html>

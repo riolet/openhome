@@ -1,5 +1,6 @@
-import random
+from django.core.exceptions import ValidationError
 from django.db import models
+import re
 
 
 class User(models.Model):
@@ -18,6 +19,13 @@ class User(models.Model):
 
     def __str__(self):
         return self.login_email
+
+
+#  Property validators:
+def validate_postal_code(value):
+    # Note: Can switch on country to switch formatting styles
+    if not re.match(r'^[A-Z]\d[A-Z]\d[A-Z]\d$', value):
+        raise ValidationError("Postal Code doesn't match A1A 1A1 format")
 
 
 class Property(models.Model):
@@ -53,7 +61,7 @@ class Property(models.Model):
 
     owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     creation_stamp = models.DateTimeField('creation time')
-    publish_stamp = models.DateTimeField('publish time', null=True, default=None)
+    publish_stamp = models.DateTimeField('publish time', null=True, blank=True, default=None)
     edit_stamp = models.DateTimeField('latest edit time')
     status = models.CharField(max_length=1, choices=STATUS)
     description = models.TextField()
@@ -64,21 +72,86 @@ class Property(models.Model):
     # Location information
     country = models.CharField(max_length=3, choices=COUNTRIES)
     province = models.CharField(max_length=2, choices=PROVINCES)
-    region = models.CharField(max_length=100)
+    region = models.CharField(max_length=100, null=False, blank=True)
     city = models.CharField(max_length=100)
-    community = models.CharField(max_length=100)
+    neighborhood = models.CharField(max_length=100, null=False, blank=True)
     street_address = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=6)
+    postal_code = models.CharField(max_length=6, null=False, blank=False, validators=[validate_postal_code])
     # lat/long at 6 decimal places = 1.113m precision.
-    latitude = models.DecimalField(max_digits=9, decimal_places=6)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=False, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=False, blank=True)
+
+    def normalize_fields(self):
+        """
+        Trim spaces and newlines, convert to numbers, and capitalize as needed.
+
+        user-submitted data in fields:
+            status
+            description
+            price
+            property_tax
+            property_type
+            country
+            province
+            region
+            city
+            neighborhood
+            street_address
+            postal_code
+            latitude
+            longitude
+        """
+        self.status = self.status.upper().strip()
+        self.description = self.description.strip()
+        self.price = float(self.price)
+        self.property_tax = float(self.property_tax)
+        self.property_type = self.property_type.strip()
+        self.country = self.country.upper().strip()
+        self.province = self.province.upper().strip()
+        self.region = self.region.strip()
+        self.city = self.city.strip()
+        self.neighborhood = self.neighborhood.strip()
+        self.street_address = self.street_address.strip()
+        self.postal_code = self.postal_code.replace(' ', '').strip()
+        self.latitude = ((float(self.latitude) + 180) % 360) - 180
+        self.longitude = ((float(self.longitude) + 180) % 360) - 180
+
+    def escape_fields(self):
+        """
+        Django's ORM automatically escapes data being inserted into it.
+        Django's template engine automatically escapes html being inserted into elements.
+        Any additional escaping should be done here.
+
+        user-submitted data in fields:
+            status
+            description
+            price
+            property_tax
+            property_type
+            country
+            province
+            region
+            city
+            neighborhood
+            street_address
+            postal_code
+            latitude
+            longitude
+        """
+        pass
 
     def generate_id(self):
         p_code = str(self.postal_code)
         d_stamp = str(int(self.creation_stamp.timestamp() // 86400))  # 86400 is seconds/day
         prefix = p_code + d_stamp
-        # TODO: get next in sequence for given prefix instead of random
-        prop_id = prefix + str(int(random.random() * 100000))
+        try:
+            latest = Property.objects.filter(id__startswith=prefix).order_by('-id')[0]
+            # increment the last 9 symbols. modulus 1e9.
+            next_num = int(latest.id[11:]) + 1
+            next_num = int(next_num % 1e9)
+        except IndexError:
+            next_num = 1
+        prop_id = "{}{:09d}".format(prefix, next_num)
         return prop_id
 
     def __str__(self):
