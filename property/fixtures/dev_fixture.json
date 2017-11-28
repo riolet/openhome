@@ -11,7 +11,8 @@
       "b_email": true,
       "b_phone": true,
       "b_fax": true,
-      "b_mail": true
+      "b_mail": true,
+      "last_login": "2017-11-27 15:35:00+00:00"
     }
   },
   {
@@ -21,12 +22,13 @@
       "email": "bailey@example.com",
       "phone": "250-331-6419",
       "fax": "",
-      "mail": null,
+      "mail": "",
       "message": "",
       "b_email": true,
       "b_phone": false,
       "b_fax": false,
-      "b_mail": true
+      "b_mail": true,
+      "last_login": "2017-11-27 15:35:00+00:00"
     }
   },
   {
