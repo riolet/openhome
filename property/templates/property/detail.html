@@ -113,5 +113,21 @@
   {% endfor %}
   </ul>
 {% endif %}
+<h2>Seller's Contact Info:</h2>
+{{ property.owner.message }}
+<ul>
+{% if property.owner.b_email and property.owner.email %}
+  <li>Email Address: {{property.owner.email}}</li>
+{% endif %}
+{% if property.owner.b_phone and property.owner.phone %}
+  <li>Phone Number: {{property.owner.phone}}</li>
+{% endif %}
+{% if property.owner.b_fax and property.owner.fax %}
+  <li>Fax Number: {{property.owner.fax}}</li>
+{% endif %}
+{% if property.owner.b_mail and property.owner.mail %}
+  <li>Mailing Address: {{property.owner.mail}}</li>
+{% endif %}
+</ul>
 </body>
 </html>
