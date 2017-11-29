@@ -123,6 +123,7 @@ def edit(request, property_id):
             'country_choices': Property.COUNTRIES,
             'status_choices': Property.STATUS,
             'province_choices': Property.PROVINCES,
+            'garage_choices': House.GARAGES
         })
 
 

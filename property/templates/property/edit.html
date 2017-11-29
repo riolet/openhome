@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <title>Editing Property: {{property.id}}</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 </head>
 <body>
 <h1>Property at {{property.street_address}}</h1>
@@ -18,6 +22,8 @@
 {% endif %}
 <form id="edit_property" action="{% url 'property:edit' property.id %}" method="post">
 {% csrf_token %}
+  <input type="hidden" name="type" value="property" />
+  <input type="hidden" name="pk" value="{{property.pk}}" />
   <!--price -->
   <label for="price">Price</label>
   <input name="price" id="price" type="number" placeholder="400,000.00" min="0" step="0.01" value="{{property.price}}" required />
@@ -27,7 +33,7 @@
     <legend>Address</legend>
     <!--country-->
     <label for="country">Country:</label>
-    <select form="new_property" name="country" id="country" required>
+    <select form="edit_property" name="country" id="country" required>
     {% for n, country in country_choices %}
       {% if n == property.country|default:"CAN" %}
       <option value="{{n}}" selected>{{country}}</option>
@@ -40,7 +46,7 @@
 
     <!--province-->
     <label for="province">Province:</label>
-    <select form="new_property" name="province" id="province" required>
+    <select form="edit_property" name="province" id="province" required>
     {% for n, province in province_choices %}
       {% if n == property.province|default:"BC" %}
       <option value="{{n}}" selected>{{province}}</option>
@@ -108,7 +114,7 @@
   <br />
   <textarea name="description" id="description" rows=5 cols=70 form="new_property" required>{{property.description}}</textarea>
   <br />
-  <input type="submit" value="Save" />
+  <input type="submit" value="Save Changes" />
 </form>
 
 
@@ -116,106 +122,304 @@
 
 <h2>Land</h2>
 {% if property.lot_set.count %}
-  <ul>
-  {% for lot in property.lot_set.all %}
-    <li>{{forloop.counter}}. {{lot.square_meters|floatformat:"0" }}m², {{ lot.zoning }}: {{ lot.description }}</li>
-    {% if lot.structure_set.count %}
-      <li>Other structures:
-        <ul>
-          {% for structure in lot.structure_set.all %}
-            <li>{{forloop.counter}}. {{structure.width|floatformat:"-1"}}x{{structure.depth|floatformat:"-1"}}x{{structure.height|floatformat:"-1"}}m - {{structure.description}}</li>
-          {% endfor %}
-        </ul>
-      </li>
-    {% endif %}
+{% for lot in property.lot_set.all %}
+  <form id="edit_lot_{{lot.pk}}" action="{% url 'property:edit' property.id %}" method="post">
+    <div class="lot">
+      <h3>Lot {{lot.pk}}</h3>
+      <input type="hidden" name="type" value="lot" />
+      <input type="hidden" name="pk" value="{{lot.pk}}" />
+      <label for="lot_{{lot.pk}}__square_meters">Square meters:</label>
+      <input name="square_meters" id="lot_{{lot.pk}}__square_meters" type="number" placeholder="200,000" min="0" step="0.1" value="{{lot.square_meters}}" required />
+      <br />
+
+      <label for="lot_{{lot.pk}}__width">Width (street-facing side):</label>
+      <input name="width" id="lot_{{lot.pk}}__width" type="number" placeholder="100.0" min="0" step="0.1" value="{{lot.width}}" required />
+      <br />
+
+      <label for="lot_{{lot.pk}}__depth">Depth:</label>
+      <input name="depth" id="lot_{{lot.pk}}__depth" type="number" placeholder="200.0" min="0" step="0.1" value="{{lot.depth}}" required />
+      <br />
+
+      <label for="lot_{{lot.pk}}__zoning">Zoning:</label>
+      <input name="zoning" id="lot_{{lot.pk}}__zoning" type="text" placeholder="Residential" value="{{lot.zoning}}" required />
+      <br />
+
+      <label for="lot_{{lot.pk}}__description">Description of lot:</label>
+      <br />
+      <textarea name="description" id="lot_{{lot.pk}}__description" rows=3 cols=70 form="edit_lot_{{lot.pk}}" required>{{lot.description}}</textarea>
+      <br />
+      <input type="submit" value="Save Changes" />
+    </div>
+  </form>
+  <h3>Structures on the land that aren't the primary house</h3>
+  {% if lot.structure_set.count %}
+  {% for structure in lot.structure_set.all %}
+    <form id="edit_structure_{{structure.pk}}" action="{% url 'property:edit' property.id %}" method="post">
+      <div class="structure">
+        <h4>Structure {{structure.pk}}</h4>
+        <input type="hidden" name="type" value="structure" />
+        <input type="hidden" name="pk" value="{{structure.pk}}" />
+        <label for="structure_{{structure.pk}}__square_meters">Square meters:</label>
+        <input name="square_meters" id="structure_{{structure.pk}}__square_meters" type="number" placeholder="6" min="0" step="0.1" value="{{structure.square_meters}}" required />
+        <br />
+  
+        <label for="structure_{{structure.pk}}__width">Width:</label>
+        <input name="width" id="structure_{{structure.pk}}__width" type="number" placeholder="3.0" min="0" step="0.1" value="{{structure.width}}" required />
+        <br />
+  
+        <label for="structure_{{structure.pk}}__depth">Depth:</label>
+        <input name="depth" id="structure_{{structure.pk}}__depth" type="number" placeholder="2.0" min="0" step="0.1" value="{{structure.depth}}" required />
+        <br />
+  
+        <label for="structure_{{structure.pk}}__height">Height:</label>
+        <input name="height" id="structure_{{structure.pk}}__height" type="number" placeholder="2.5" min="0" step="0.1" value="{{structure.height}}" required />
+        <br />
+  
+        <label for="structure_{{structure.pk}}__description">Description of structure:</label>
+        <br />
+        <textarea name="description" id="structure_{{structure.pk}}__description" rows=3 cols=70 form="edit_structure_{{structure.pk}}" required>{{structure.description}}</textarea>
+        <br />
+        <input type="submit" value="Save Changes" />
+      </div>
+    </form>
   {% endfor %}
-  </ul>
+  <input type="button" value="Add Structure" />
+  {% endif %}
+{% endfor %}
 {% else %}
 <p>No lots listed</p>
 {% endif %}
+<input type="button" value="Add Lot"/>
 
 
 <!-- House Information -->
 
-<h2>Houses</h2>
+<h2>House</h2>
 {% if property.house_set.count %}
-  <ul>
-  {% for house in property.house_set.all %}
-    <li>{{forloop.counter}}. {{ house.square_meters|floatformat:"0" }}m², {{ house.beds }} beds, {{ house.baths|add:house.halfbaths }} baths
-      <ul>
-        <li>Year: {{house.year}}</li>
-        <li>Beds: {{house.beds}}</li>
-        <li>Baths: {{house.baths}}</li>
-        <li>Half baths: {{house.halfbaths}}</li>
-        <li>Floorspace: {{house.square_meters}}m²</li>
-        <li>Floors (above ground): {{house.floors}}</li>
-        <li>Basements (below ground): {{house.basements}}</li>
-        <li>Garage: {{ house.get_garage_display }}</li>
-        <li>Parking: {{house.parking}}</li>
-        <li>Extras: {{house.extras}}</li>
-        <li>Rooms:
-          <ul>
-          {% for room in house.houseroom_set.all %}
-            <li>{{forloop.counter}}. {{room.role|capfirst}} ({{room.square_meters|floatformat:"-1"}}m², floor {{room.floor}})</li>
-          {% endfor %}
-          </ul>
-        </li>
-      </ul>
-    </li>
+{% for house in property.house_set.all %}
+  <form id="edit_house_{{house.pk}}" action="{% url 'property:edit' property.id %}" method="post">
+    <div class="house">
+      <h3>Lot {{house.pk}}</h3>
+      <input type="hidden" name="type" value="house" />
+      <input type="hidden" name="pk" value="{{house.pk}}" />
+      <label for="house_{{house.pk}}__year">Built in:</label>
+      <input name="year" id="house_{{house.pk}}__year" type="number" placeholder="1999" min="0" value="{{house.year}}" required />
+      <br />
+      
+      <label for="house_{{house.pk}}__beds">Bedrooms:</label>
+      <input name="beds" id="house_{{house.pk}}__beds" type="number" placeholder="3" min="0" value="{{house.beds}}" required />
+      <br />
+      
+      <label for="house_{{house.pk}}__baths">Bathrooms:</label>
+      <input name="baths" id="house_{{house.pk}}__baths" type="number" placeholder="1" min="0" value="{{house.baths}}" required />
+      <br />
+      
+      <label for="house_{{house.pk}}__halfbaths">Half-baths (just toilet + sink):</label>
+      <input name="halfbaths" id="house_{{house.pk}}__halfbaths" type="number" placeholder="1" min="0" value="{{house.halfbaths}}" required />
+      <br />
+      
+      <label for="house_{{house.pk}}__square_meters">Square meters:</label>
+      <input name="square_meters" id="house_{{house.pk}}__square_meters" type="number" placeholder="200" min="0" step="0.1" value="{{house.square_meters}}" required />
+      <br />
+      
+      <label for="house_{{house.pk}}__floors">Storeys (above ground):</label>
+      <input name="floors" id="house_{{house.pk}}__floors" type="number" placeholder="1" min="0" value="{{house.floors}}" required />
+      <br />
+      
+      <label for="house_{{house.pk}}__basements">Storeys (below ground):</label>
+      <input name="basements" id="house_{{house.pk}}__basements" type="number" placeholder="1" min="0" value="{{house.basements}}" required />
+      <br />
+  
+      <label for="house_{{house.pk}}__garage">Garage:</label>
+      <select form="edit_house_{{house.pk}}" name="province" id="house_{{house.pk}}__garage" required>
+      {% for n, garages in garage_choices %}
+        {% if n == house.garage|default:"0" %}
+        <option value="{{n}}" selected>{{garages}}</option>
+        {% else %}
+        <option value="{{n}}">{{garages}}</option>
+        {% endif %}
+      {% endfor %}
+      </select>
+      <br />
+      
+      <label for="house_{{house.pk}}__parking">Parking:</label>
+      <input name="parking" id="house_{{house.pk}}__parking" type="text" placeholder="Street, Underground, Driveway" value="{{house.parking}}" required />
+      <br />
+  
+      <label for="house_{{house.pk}}__extras">Extra features (pool, security system, fireplace):</label>
+      <br />
+      <textarea name="extras" id="house_{{house.pk}}__extras" rows=3 cols=70 form="edit_house_{{house.pk}}" required>{{house.extras}}</textarea>
+      <br />
+      <input type="submit" value="Save Changes" />
+    </div>
+  </form>
+  <h3>Rooms in the house:</h3>
+  {% if house.houseroom_set.count %}
+  {% for room in house.houseroom_set.all %}
+    <form id="edit_houseroom_{{room.pk}}" action="{% url 'property:edit' property.id %}" method="post">
+      <div class="house room">
+        <h4>Room {{room.pk}}</h4>
+        <input type="hidden" name="type" value="houseroom" />
+        <input type="hidden" name="pk" value="{{room.pk}}" />
+        <label for="houseroom_{{room.pk}}__square_meters">Square meters:</label>
+        <input name="square_meters" id="houseroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
+        <br />
+  
+        <label for="houseroom_{{room.pk}}__floor">Floor:</label>
+        <input name="floor" id="houseroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
+        <br />
+  
+        <label for="houseroom_{{room.pk}}__role">Role:</label>
+        <input name="role" id="houseroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
+        <br />
+  
+        <input type="submit" value="Save Changes" />
+      </div>
+    </form>
   {% endfor %}
-  </ul>
+  {% endif %}
+  <input type="button" value="Add Room"/>
+{% endfor %}
 {% else %}
-<p>No houses listed</p>
+<p>No house listed</p>
 {% endif %}
+<input type="button" value="Add House"/>
 
 
 <!-- Suite information -->
 
 
+<h2>Suite</h2>
 {% if property.suite_set.count %}
-  <h2>Suites</h2>
-  <ul>
-  {% for suite in property.suite_set.all %}
-    <li>{{forloop.counter}}. {{ suite.square_meters|floatformat:"0" }}m², {{ suite.beds }} beds, {{ suite.baths|add:suite.halfbaths }} baths
-      <ul>
-        <li>Year: {{suite.year}}</li>
-        <li>Beds: {{suite.beds}}</li>
-        <li>Baths: {{suite.baths}}</li>
-        <li>Half Baths: {{suite.halfbaths}}</li>
-        <li>Floorspace: {{suite.square_meters}}m²</li>
-        <li>Floors (above ground): {{suite.floors}}</li>
-        <li>Basements (below ground): {{suite.basements}}</li>
-        <li>Garage: {{ suite.get_garage_display }}</li>
-        <li>Parking: {{suite.parking}}</li>
-        <li>Extras: {{suite.extras}}</li>
-        <li>Strata info:
-          <ul>
-            <li>Unit Number: {{suite.unit_number}}</li>
-            <li>Annual Strata Fee: ${{suite.annual_strata_fee|floatformat:"2"}}</li>
-            <li>Pet Rules: {{suite.pet_rules}}</li>
-            <li>Shared Fitness Room: {{suite.shared_fitness_room}}</li>
-            <li>Shared Pool: {{suite.shared_pool}}</li>
-            <li>Shared Party Room: {{suite.shared_party_room}}</li>
-            <li>Shared Private Courtyard: {{suite.shared_private_courtyard}}</li>
-            <li>Shared Laundry: {{suite.shared_laundry}}</li>
-            <li>Units in Building: {{suite.units_in_building}}</li>
-            <li>Building Floors: {{suite.building_floors}}</li>
-          </ul>
-        </li>
-        <li>Rooms:
-          <ul>
-          {% for room in suite.suiteroom_set.all %}
-            <li>{{forloop.counter}}. {{room.role|capfirst}} ({{room.square_meters|floatformat:"-1"}}m², floor {{room.floor}})</li>
-          {% endfor %}
-          </ul>
-        </li>
-      </ul>
-    </li>
+{% for suite in property.suite_set.all %}
+  <form id="edit_suite_{{suite.pk}}" action="{% url 'property:edit' property.id %}" method="post">
+    <div class="suite">
+      <h3>Lot {{suite.pk}}</h3>
+      <input type="hidden" name="type" value="suite" />
+      <input type="hidden" name="pk" value="{{suite.pk}}" />
+      <label for="suite_{{suite.pk}}__year">Built in:</label>
+      <input name="year" id="suite_{{suite.pk}}__year" type="number" placeholder="1999" min="0" value="{{suite.year}}" required />
+      <br />
+      
+      <label for="suite_{{suite.pk}}__beds">Bedrooms:</label>
+      <input name="beds" id="suite_{{suite.pk}}__beds" type="number" placeholder="3" min="0" value="{{suite.beds}}" required />
+      <br />
+      
+      <label for="suite_{{suite.pk}}__baths">Bathrooms:</label>
+      <input name="baths" id="suite_{{suite.pk}}__baths" type="number" placeholder="1" min="0" value="{{suite.baths}}" required />
+      <br />
+      
+      <label for="suite_{{suite.pk}}__halfbaths">Half-baths (just toilet + sink):</label>
+      <input name="halfbaths" id="suite_{{suite.pk}}__halfbaths" type="number" placeholder="1" min="0" value="{{suite.halfbaths}}" required />
+      <br />
+      
+      <label for="suite_{{suite.pk}}__square_meters">Square meters:</label>
+      <input name="square_meters" id="suite_{{suite.pk}}__square_meters" type="number" placeholder="200" min="0" step="0.1" value="{{suite.square_meters}}" required />
+      <br />
+      
+      <label for="suite_{{suite.pk}}__floors">Storeys (above ground):</label>
+      <input name="floors" id="suite_{{suite.pk}}__floors" type="number" placeholder="1" min="0" value="{{suite.floors}}" required />
+      <br />
+      
+      <label for="suite_{{suite.pk}}__basements">Storeys (below ground):</label>
+      <input name="basements" id="suite_{{suite.pk}}__basements" type="number" placeholder="1" min="0" value="{{suite.basements}}" required />
+      <br />
+  
+      <label for="suite_{{suite.pk}}__garage">Garage:</label>
+      <select form="edit_suite_{{suite.pk}}" name="province" id="suite_{{suite.pk}}__garage" required>
+      {% for n, garages in garage_choices %}
+        {% if n == suite.garage|default:"0" %}
+        <option value="{{n}}" selected>{{garages}}</option>
+        {% else %}
+        <option value="{{n}}">{{garages}}</option>
+        {% endif %}
+      {% endfor %}
+      </select>
+      <br />
+      
+      <label for="suite_{{suite.pk}}__parking">Parking:</label>
+      <input name="parking" id="suite_{{suite.pk}}__parking" type="text" placeholder="Street, Underground, Driveway" value="{{suite.parking}}" required />
+      <br />
+      
+      <label for="suite_{{suite.pk}}__unit_number">Suite number:</label>
+      <input name="unit_number" id="suite_{{suite.pk}}__unit_number" type="text" placeholder="221b" value="{{suite.unit_number}}" required />
+      <br />
+      
+      <label for="suite_{{suite.pk}}__annual_strata_fee">Strata Fee (annual, estimated):</label>
+      <input name="annual_strata_fee" id="suite_{{suite.pk}}__annual_strata_fee" type="number" min="0" step="0.01" placeholder="4000.00" value="{{suite.annual_strata_fee}}" required />
+      <br />
+      
+      <label for="suite_{{suite.pk}}__pet_rules">Pet rules:</label>
+      <input name="pet_rules" id="suite_{{suite.pk}}__pet_rules" type="text" placeholder="Dogs and cats OK?" value="{{suite.pet_rules}}" required />
+      <br />
+      
+      <label for="suite_{{suite.pk}}__units_in_building">Suites in building:</label>
+      <input name="units_in_building" id="suite_{{suite.pk}}__units_in_building" type="number" min="1" placeholder="50" value="{{suite.units_in_building}}" required />
+      <br />
+      
+      <label for="suite_{{suite.pk}}__building_floors">Storeys in building:</label>
+      <input name="building_floors" id="suite_{{suite.pk}}__building_floors" type="number" min="1" placeholder="5" value="{{suite.building_floors}}" required />
+      <br />
+
+      <input name="shared_fitness_room" id="suite_{{suite.pk}}__shared_fitness_room" type="checkbox" {% if suite.shared_fitness_room %}checked {% endif %} />
+      <label for="suite_{{suite.pk}}__shared_fitness_room">Shared Fitness Room</label>
+      <br />
+      
+      <input name="shared_pool" id="suite_{{suite.pk}}__shared_pool" type="checkbox" {% if suite.shared_pool %}checked {% endif %} />
+      <label for="suite_{{suite.pk}}__shared_pool">Shared Pool</label>
+      <br />
+      
+      <input name="shared_party_room" id="suite_{{suite.pk}}__shared_party_room" type="checkbox" {% if suite.shared_party_room %}checked {% endif %} />
+      <label for="suite_{{suite.pk}}__shared_party_room">Shared Party Room</label>
+      <br />
+      
+      <input name="shared_private_courtyard" id="suite_{{suite.pk}}__shared_private_courtyard" type="checkbox" {% if suite.shared_private_courtyard %}checked {% endif %} />
+      <label for="suite_{{suite.pk}}__shared_private_courtyard">Shared Private Courtyard</label>
+      <br />
+      
+      <input name="shared_laundry" id="suite_{{suite.pk}}__shared_laundry" type="checkbox" {% if suite.shared_laundry %}checked {% endif %} />
+      <label for="suite_{{suite.pk}}__shared_laundry">Shared Laundry Room</label>
+      <br />
+
+      <label for="suite_{{suite.pk}}__extras">Extra features (pool, security system, fireplace):</label>
+      <br />
+      <textarea name="extras" id="suite_{{suite.pk}}__extras" rows=3 cols=70 form="edit_suite_{{suite.pk}}" required>{{suite.extras}}</textarea>
+      <br />
+
+      <input type="submit" value="Save Changes" />
+    </div>
+  </form>
+  <h3>Rooms in the suite:</h3>
+  {% if suite.suiteroom_set.count %}
+  {% for room in suite.suiteroom_set.all %}
+    <form id="edit_suiteroom_{{room.pk}}" action="{% url 'property:edit' property.id %}" method="post">
+      <div class="suite room">
+        <h4>Room {{room.pk}}</h4>
+        <input type="hidden" name="type" value="suiteroom" />
+        <input type="hidden" name="pk" value="{{room.pk}}" />
+        <label for="suiteroom_{{room.pk}}__square_meters">Square meters:</label>
+        <input name="square_meters" id="suiteroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
+        <br />
+  
+        <label for="suiteroom_{{room.pk}}__floor">Floor:</label>
+        <input name="floor" id="suiteroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
+        <br />
+  
+        <label for="suiteroom_{{room.pk}}__role">Role:</label>
+        <input name="role" id="suiteroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
+        <br />
+  
+        <input type="submit" value="Save Changes" />
+      </div>
+    </form>
   {% endfor %}
-  </ul>
+  {% endif %}
+  <input type="button" value="Add Room"/>
+{% endfor %}
 {% else %}
-<p>No suites listed</p>
+<p>No suite listed</p>
 {% endif %}
+<input type="button" value="Add Suite"/>
 
 
 <!-- Seller's Contact Info -->
