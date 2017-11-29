@@ -24,7 +24,7 @@ class DetailView(generic.DetailView):
 
 
 def search_results(request):
-    return HttpResponse("Search page. Specify filters and see results.")
+    return render(request, 'property/results.html')
 
 
 def search(request):
