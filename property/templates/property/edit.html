@@ -12,88 +12,28 @@
 <body>
 {% include './nav.html' %}
 
+<div class="container">
 <h1>Property at {{property.street_address}}</h1>
+<hr />
 {% if errors %}
-<h2>Errors in your submission:</h2>
-<ul>
-{% for key, value in errors.items %}
-  <li>{{key}}: {{value}}</li>
-{% endfor %}
-</ul>
+<div class="alert alert-danger" role="alert">
+  <h3>There were errors creating your property listing:</h3>
+  <ul>
+  {% for key, value in errors.items %}
+    <li>{{key}}: {{value}}</li>
+  {% endfor %}
+  </ul>
+</div>
 {% endif %}
 <form id="edit_property" action="{% url 'property:edit' property.id %}" method="post">
 {% csrf_token %}
-  <input type="hidden" name="type" value="property" />
-  <input type="hidden" name="pk" value="{{property.pk}}" />
-  <!--price -->
-  <label for="price">Price</label>
-  <input name="price" id="price" type="number" placeholder="400,000.00" min="0" step="0.01" value="{{property.price}}" required />
-  <br />
+  <input class="form-control" type="hidden" name="type" value="property" />
+  <input class="form-control" type="hidden" name="pk" value="{{property.pk}}" />
 
-  <fieldset>
-    <legend>Address</legend>
-    <!--country-->
-    <label for="country">Country:</label>
-    <select form="edit_property" name="country" id="country" required>
-    {% for n, country in country_choices %}
-      {% if n == property.country|default:"CAN" %}
-      <option value="{{n}}" selected>{{country}}</option>
-      {% else %}
-      <option value="{{n}}">{{country}}</option>
-      {% endif %}
-    {% endfor %}
-    </select>
-    <br />
-
-    <!--province-->
-    <label for="province">Province:</label>
-    <select form="edit_property" name="province" id="province" required>
-    {% for n, province in province_choices %}
-      {% if n == property.province|default:"BC" %}
-      <option value="{{n}}" selected>{{province}}</option>
-      {% else %}
-      <option value="{{n}}">{{province}}</option>
-      {% endif %}
-    {% endfor %}
-    </select>
-    <br />
-
-    <!--region-->
-    <label for="region">Region:</label>
-    <input name="region" id="region" type="text" placeholder="Fraser Valley" value="{{property.region}}"/>
-    <br />
-
-    <!--city-->
-    <label for="city">City:</label>
-    <input name="city" id="city" type="text" placeholder="Abbotsford" value="{{property.city}}" required />
-    <br />
-
-    <!--community-->
-    <label for="neighborhood">Neighborhood:</label>
-    <input name="neighborhood" id="neighborhood" type="text" placeholder="Straiton Bowl" value="{{property.neighborhood}}" />
-    <br />
-
-    <!--street_address-->
-    <label for="street_address">Street Address:</label>
-    <input name="street_address" id="street_address" type="text" placeholder="123 Farina Rd" value="{{property.street_address}}" required />
-    <br />
-
-    <!--postal_code-->
-    <label for="postal_code">Postal Code:</label>
-    <input name="postal_code" id="postal_code" type="text" placeholder="V3G 1R4" value="{{property.postal_code}}" />
-    <br />
-
-    <!--latitude and longitude-->
-    <label for="latitude">Latitude & Longitude (optional, for more accurate pin):</label>
-    <br />
-    <input name="latitude" id="latitude" type="number" placeholder="49.082682" value="{{property.latitude}}" />
-    <input name="longitude" id="longitude" type="number" placeholder="-122.210422" value="{{property.longitude}}" />
-    <br />
-  </fieldset>
 
   <!--property_type-->
   <label for="property_type">Property Type (detached, townhouse, etc):</label>
-  <input name="property_type" id="property_type" list="ptype" value="{{property.property_type}}" required>
+  <input class="form-control" name="property_type" id="property_type" list="ptype" value="{{property.property_type}}" required>
   <datalist id="ptype">
     <option value="Detached">
     <option value="Semi-Detached">
@@ -103,53 +43,174 @@
     <option value="Condominium">
     <option value="Safari">
   </datalist>
-  <br />
 
-  <!--property_tax-->
-  <label for="property_tax">Property Tax (annual, estimate):</label>
-  <input name="property_tax" id="property_tax" type="number" placeholder="4,000.00" min="0" step="0.01" value="{{property.property_tax}}" required />
-  <br />
+  <div class="row">
+    <div class="col-sm">
+      <!--price -->
+      <div class="form-group">
+        <label for="price">Price</label>
+        <div class="input-group">
+          <span class="input-group-addon">$</span>
+          <input class="form-control" name="price" id="price" type="number" placeholder="400,000.00" min="0" step="0.01" value="{{property.price}}" required />
+        </div>
+      </div>
+    </div>
+    <div class="col-sm">
+      <!--property_tax-->
+      <div class="form-group">
+        <label for="property_tax">Property Tax (annual, estimate):</label>
+        <div class="input-group">
+          <span class="input-group-addon">$</span>
+          <input class="form-control" name="property_tax" id="property_tax" type="number" placeholder="4,000.00" min="0" step="0.01" value="{{property.property_tax}}" required />
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <!--description [textarea]-->
-  <label for="description">Description of property:</label>
-  <br />
-  <textarea name="description" id="description" rows=5 cols=70 form="new_property" required>{{property.description}}</textarea>
-  <br />
-  <input type="submit" value="Save Changes" />
+  <hr />
+  <fieldset>
+    <legend>Address</legend>
+    <div class="row">
+      <div class="col-md">
+        <!--country-->
+        <div class="form-group">
+          <label for="country">Country</label>
+          <select class="form-control" form="edit_property" name="country" id="country" required>
+          {% for n, country in country_choices %}
+            {% if n == property.country|default:"CAN" %}
+            <option value="{{n}}" selected>{{country}}</option>
+            {% else %}
+            <option value="{{n}}">{{country}}</option>
+            {% endif %}
+          {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="col-md">
+        <!--province-->
+        <div class="form-group">
+          <label for="province">Province</label>
+          <select class="form-control" form="edit_property" name="province" id="province" required>
+          {% for n, province in province_choices %}
+            {% if n == property.province|default:"BC" %}
+            <option value="{{n}}" selected>{{province}}</option>
+            {% else %}
+            <option value="{{n}}">{{province}}</option>
+            {% endif %}
+          {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md">
+        <!--city-->
+        <div class="form-group">
+          <label for="city">City</label>
+          <input class="form-control" name="city" id="city" type="text" placeholder="Abbotsford" value="{{property.city}}" required />
+        </div>
+      </div>
+      <div class="col-md">
+        <!--region-->
+        <div class="form-group">
+          <label for="region">Region</label>
+          <input class="form-control" name="region" id="region" type="text" placeholder="Fraser Valley" value="{{property.region}}"/>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-md">
+        <!--postal_code-->
+        <div class="form-group">
+          <label for="postal_code">Postal Code</label>
+          <input class="form-control" name="postal_code" id="postal_code" type="text" placeholder="V3G 1R4" value="{{property.postal_code}}" />
+        </div>
+      </div>
+      <div class="col-md">
+        <!--community-->
+        <div class="form-group">
+          <label for="neighborhood">Neighborhood</label>
+          <input class="form-control" name="neighborhood" id="neighborhood" type="text" placeholder="Straiton Bowl" value="{{property.neighborhood}}" />
+        </div>
+      </div>
+    </div>
+
+    <!--street_address-->
+    <div class="form-group">
+      <label for="street_address">Street Address</label>
+      <input class="form-control" name="street_address" id="street_address" type="text" placeholder="123 Farina Rd" value="{{property.street_address}}" required />
+    </div>
+
+    <!--latitude and longitude-->
+    <div class="form-group">
+      <label for="latitude">Latitude & Longitude (optional, for more accurate pin)</label>
+      <div class="row">
+        <div class="col-sm">
+          <input class="form-control" name="latitude" id="latitude" type="number" placeholder="49.082682" value="{{property.latitude}}" />
+          <small class="form-text text-muted">Latitude</small>
+        </div>
+        <div class="col-sm">
+          <input class="form-control" name="longitude" id="longitude" type="number" placeholder="-122.210422" value="{{property.longitude}}" />
+          <small class="form-text text-muted">Longitude</small>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <!--description-->
+  <div class="form-group">
+    <label for="description">Description of property</label>
+    <textarea class="form-control" name="description" id="description" rows=5 cols=70 form="new_property" required>{{property.description}}</textarea>
+  </div>
+
+  <input class="btn btn-primary" type="submit" value="Save Changes" />
 </form>
 
 
 <!-- Land Information -->
 
+<hr />
 <h2>Land</h2>
 {% if property.lot_set.count %}
 {% for lot in property.lot_set.all %}
   <form id="edit_lot_{{lot.pk}}" action="{% url 'property:edit' property.id %}" method="post">
     <div class="lot">
+    <input class="form-control" type="hidden" name="type" value="lot" />
+    <input class="form-control" type="hidden" name="pk" value="{{lot.pk}}" />
       <h3>Lot {{lot.pk}}</h3>
-      <input type="hidden" name="type" value="lot" />
-      <input type="hidden" name="pk" value="{{lot.pk}}" />
-      <label for="lot_{{lot.pk}}__square_meters">Square meters:</label>
-      <input name="square_meters" id="lot_{{lot.pk}}__square_meters" type="number" placeholder="200,000" min="0" step="0.1" value="{{lot.square_meters}}" required />
+      <div class="row">
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="lot_{{lot.pk}}__square_meters">Square meters</label>
+            <input class="form-control" name="square_meters" id="lot_{{lot.pk}}__square_meters" type="number" placeholder="200,000" min="0" step="0.1" value="{{lot.square_meters}}" required />
+          </div>
+        </div>
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="lot_{{lot.pk}}__width">Width (street-facing side)</label>
+            <input class="form-control" name="width" id="lot_{{lot.pk}}__width" type="number" placeholder="100.0" min="0" step="0.1" value="{{lot.width}}" required />
+          </div>
+        </div>
+        <div class="col-sm">
+          <div class="form-group">
+            <label for="lot_{{lot.pk}}__depth">Depth</label>
+            <input class="form-control" name="depth" id="lot_{{lot.pk}}__depth" type="number" placeholder="200.0" min="0" step="0.1" value="{{lot.depth}}" required />
+          </div>
+        </div>
+      </div>
+
+      <label for="lot_{{lot.pk}}__zoning">Zoning</label>
+      <input class="form-control" name="zoning" id="lot_{{lot.pk}}__zoning" type="text" placeholder="residential, mixed-use, rural, commercial" value="{{lot.zoning}}" required />
       <br />
 
-      <label for="lot_{{lot.pk}}__width">Width (street-facing side):</label>
-      <input name="width" id="lot_{{lot.pk}}__width" type="number" placeholder="100.0" min="0" step="0.1" value="{{lot.width}}" required />
+      <label for="lot_{{lot.pk}}__description">Description of lot</label>
       <br />
-
-      <label for="lot_{{lot.pk}}__depth">Depth:</label>
-      <input name="depth" id="lot_{{lot.pk}}__depth" type="number" placeholder="200.0" min="0" step="0.1" value="{{lot.depth}}" required />
+      <textarea class="form-control" name="description" id="lot_{{lot.pk}}__description" rows=3 cols=70 form="edit_lot_{{lot.pk}}" required>{{lot.description}}</textarea>
       <br />
-
-      <label for="lot_{{lot.pk}}__zoning">Zoning:</label>
-      <input name="zoning" id="lot_{{lot.pk}}__zoning" type="text" placeholder="Residential" value="{{lot.zoning}}" required />
-      <br />
-
-      <label for="lot_{{lot.pk}}__description">Description of lot:</label>
-      <br />
-      <textarea name="description" id="lot_{{lot.pk}}__description" rows=3 cols=70 form="edit_lot_{{lot.pk}}" required>{{lot.description}}</textarea>
-      <br />
-      <input type="submit" value="Save Changes" />
+      <input class="btn btn-primary" type="submit" value="Save Changes" />
     </div>
   </form>
   <h3>Structures on the land that aren't the primary house</h3>
@@ -158,273 +219,400 @@
     <form id="edit_structure_{{structure.pk}}" action="{% url 'property:edit' property.id %}" method="post">
       <div class="structure">
         <h4>Structure {{structure.pk}}</h4>
-        <input type="hidden" name="type" value="structure" />
-        <input type="hidden" name="pk" value="{{structure.pk}}" />
+        <input class="form-control" type="hidden" name="type" value="structure" />
+        <input class="form-control" type="hidden" name="pk" value="{{structure.pk}}" />
         <label for="structure_{{structure.pk}}__square_meters">Square meters:</label>
-        <input name="square_meters" id="structure_{{structure.pk}}__square_meters" type="number" placeholder="6" min="0" step="0.1" value="{{structure.square_meters}}" required />
+        <input class="form-control" name="square_meters" id="structure_{{structure.pk}}__square_meters" type="number" placeholder="6" min="0" step="0.1" value="{{structure.square_meters}}" required />
         <br />
   
         <label for="structure_{{structure.pk}}__width">Width:</label>
-        <input name="width" id="structure_{{structure.pk}}__width" type="number" placeholder="3.0" min="0" step="0.1" value="{{structure.width}}" required />
+        <input class="form-control" name="width" id="structure_{{structure.pk}}__width" type="number" placeholder="3.0" min="0" step="0.1" value="{{structure.width}}" required />
         <br />
   
         <label for="structure_{{structure.pk}}__depth">Depth:</label>
-        <input name="depth" id="structure_{{structure.pk}}__depth" type="number" placeholder="2.0" min="0" step="0.1" value="{{structure.depth}}" required />
+        <input class="form-control" name="depth" id="structure_{{structure.pk}}__depth" type="number" placeholder="2.0" min="0" step="0.1" value="{{structure.depth}}" required />
         <br />
   
         <label for="structure_{{structure.pk}}__height">Height:</label>
-        <input name="height" id="structure_{{structure.pk}}__height" type="number" placeholder="2.5" min="0" step="0.1" value="{{structure.height}}" required />
+        <input class="form-control" name="height" id="structure_{{structure.pk}}__height" type="number" placeholder="2.5" min="0" step="0.1" value="{{structure.height}}" required />
         <br />
   
         <label for="structure_{{structure.pk}}__description">Description of structure:</label>
         <br />
-        <textarea name="description" id="structure_{{structure.pk}}__description" rows=3 cols=70 form="edit_structure_{{structure.pk}}" required>{{structure.description}}</textarea>
+        <textarea class="form-control" name="description" id="structure_{{structure.pk}}__description" rows=3 cols=70 form="edit_structure_{{structure.pk}}" required>{{structure.description}}</textarea>
         <br />
-        <input type="submit" value="Save Changes" />
+        <input class="btn btn-primary" type="submit" value="Save Changes" />
       </div>
     </form>
   {% endfor %}
-  <input type="button" value="Add Structure" />
+  {% else %}
+  <p>No other structures.</p>
   {% endif %}
+  <input class="btn btn-success" type="button" value="Add Structure" />
 {% endfor %}
 {% else %}
-<p>No lots listed</p>
+<p>No land included.</p>
 {% endif %}
-<input type="button" value="Add Lot"/>
+<input class="btn btn-success" type="button" value="Add Lot"/>
 
 
 <!-- House Information -->
 
+<hr />
 <h2>House</h2>
 {% if property.house_set.count %}
 {% for house in property.house_set.all %}
   <form id="edit_house_{{house.pk}}" action="{% url 'property:edit' property.id %}" method="post">
+    <input class="form-control" type="hidden" name="type" value="house" />
+    <input class="form-control" type="hidden" name="pk" value="{{house.pk}}" />
     <div class="house">
       <h3>Lot {{house.pk}}</h3>
-      <input type="hidden" name="type" value="house" />
-      <input type="hidden" name="pk" value="{{house.pk}}" />
-      <label for="house_{{house.pk}}__year">Built in:</label>
-      <input name="year" id="house_{{house.pk}}__year" type="number" placeholder="1999" min="0" value="{{house.year}}" required />
-      <br />
-      
-      <label for="house_{{house.pk}}__beds">Bedrooms:</label>
-      <input name="beds" id="house_{{house.pk}}__beds" type="number" placeholder="3" min="0" value="{{house.beds}}" required />
-      <br />
-      
-      <label for="house_{{house.pk}}__baths">Bathrooms:</label>
-      <input name="baths" id="house_{{house.pk}}__baths" type="number" placeholder="1" min="0" value="{{house.baths}}" required />
-      <br />
-      
-      <label for="house_{{house.pk}}__halfbaths">Half-baths (just toilet + sink):</label>
-      <input name="halfbaths" id="house_{{house.pk}}__halfbaths" type="number" placeholder="1" min="0" value="{{house.halfbaths}}" required />
-      <br />
-      
-      <label for="house_{{house.pk}}__square_meters">Square meters:</label>
-      <input name="square_meters" id="house_{{house.pk}}__square_meters" type="number" placeholder="200" min="0" step="0.1" value="{{house.square_meters}}" required />
-      <br />
-      
-      <label for="house_{{house.pk}}__floors">Storeys (above ground):</label>
-      <input name="floors" id="house_{{house.pk}}__floors" type="number" placeholder="1" min="0" value="{{house.floors}}" required />
-      <br />
-      
-      <label for="house_{{house.pk}}__basements">Storeys (below ground):</label>
-      <input name="basements" id="house_{{house.pk}}__basements" type="number" placeholder="1" min="0" value="{{house.basements}}" required />
-      <br />
-  
-      <label for="house_{{house.pk}}__garage">Garage:</label>
-      <select form="edit_house_{{house.pk}}" name="province" id="house_{{house.pk}}__garage" required>
-      {% for n, garages in garage_choices %}
-        {% if n == house.garage|default:"0" %}
-        <option value="{{n}}" selected>{{garages}}</option>
-        {% else %}
-        <option value="{{n}}">{{garages}}</option>
-        {% endif %}
-      {% endfor %}
-      </select>
-      <br />
-      
-      <label for="house_{{house.pk}}__parking">Parking:</label>
-      <input name="parking" id="house_{{house.pk}}__parking" type="text" placeholder="Street, Underground, Driveway" value="{{house.parking}}" required />
-      <br />
-  
-      <label for="house_{{house.pk}}__extras">Extra features (pool, security system, fireplace):</label>
-      <br />
-      <textarea name="extras" id="house_{{house.pk}}__extras" rows=3 cols=70 form="edit_house_{{house.pk}}" required>{{house.extras}}</textarea>
-      <br />
-      <input type="submit" value="Save Changes" />
+      <div class="row">
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="house_{{house.pk}}__year">Built in</label>
+            <input class="form-control" name="year" id="house_{{house.pk}}__year" type="number" placeholder="1999" min="0" value="{{house.year}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="house_{{house.pk}}__beds">Bedrooms</label>
+            <input class="form-control" name="beds" id="house_{{house.pk}}__beds" type="number" placeholder="3" min="0" value="{{house.beds}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="house_{{house.pk}}__baths">Bathrooms</label>
+            <input class="form-control" name="baths" id="house_{{house.pk}}__baths" type="number" placeholder="1" min="0" value="{{house.baths}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="house_{{house.pk}}__halfbaths">Half-baths</label>
+            <input class="form-control" name="halfbaths" id="house_{{house.pk}}__halfbaths" type="number" placeholder="1" min="0" value="{{house.halfbaths}}" required />
+            <small class="form-text text-muted">Toilet and sink</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="house_{{house.pk}}__square_meters">Square meters</label>
+            <input class="form-control" name="square_meters" id="house_{{house.pk}}__square_meters" type="number" placeholder="200" min="0" step="0.1" value="{{house.square_meters}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="house_{{house.pk}}__floors">Storeys</label>
+            <input class="form-control" name="floors" id="house_{{house.pk}}__floors" type="number" placeholder="1" min="0" value="{{house.floors}}" required />
+            <small class="form-text text-muted">above ground</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="house_{{house.pk}}__basements">Basements</label>
+            <input class="form-control" name="basements" id="house_{{house.pk}}__basements" type="number" placeholder="1" min="0" value="{{house.basements}}" required />
+            <small class="form-text text-muted">below ground</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="house_{{house.pk}}__garage">Garage</label>
+            <select class="form-control" form="edit_house_{{house.pk}}" name="province" id="house_{{house.pk}}__garage" required>
+            {% for n, garages in garage_choices %}
+              {% if n == house.garage|default:"0" %}
+              <option value="{{n}}" selected>{{garages}}</option>
+              {% else %}
+              <option value="{{n}}">{{garages}}</option>
+              {% endif %}
+            {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="house_{{house.pk}}__parking">Parking</label>
+        <input class="form-control" name="parking" id="house_{{house.pk}}__parking" type="text" placeholder="Street, Underground, Driveway" value="{{house.parking}}" required />
+      </div>
+
+      <div class="form-group">
+      <label for="house_{{house.pk}}__extras">Extra features (pool, security system, fireplace)</label>
+      <textarea class="form-control" name="extras" id="house_{{house.pk}}__extras" rows=3 cols=70 form="edit_house_{{house.pk}}" required>{{house.extras}}</textarea>
+      </div>
+
+      <input class="btn btn-primary" type="submit" value="Save Changes" />
     </div>
   </form>
   <h3>Rooms in the house:</h3>
-  {% if house.houseroom_set.count %}
-  {% for room in house.houseroom_set.all %}
-    <form id="edit_houseroom_{{room.pk}}" action="{% url 'property:edit' property.id %}" method="post">
-      <div class="house room">
-        <h4>Room {{room.pk}}</h4>
-        <input type="hidden" name="type" value="houseroom" />
-        <input type="hidden" name="pk" value="{{room.pk}}" />
-        <label for="houseroom_{{room.pk}}__square_meters">Square meters:</label>
-        <input name="square_meters" id="houseroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
-        <br />
-  
-        <label for="houseroom_{{room.pk}}__floor">Floor:</label>
-        <input name="floor" id="houseroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
-        <br />
-  
-        <label for="houseroom_{{room.pk}}__role">Role:</label>
-        <input name="role" id="houseroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
-        <br />
-  
-        <input type="submit" value="Save Changes" />
-      </div>
-    </form>
-  {% endfor %}
-  {% endif %}
-  <input type="button" value="Add Room"/>
+  <form id="edit_houserooms" action="{% url 'property:edit' property.id %}" method="post">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Room role</th>
+        <th>Size (m²)</th>
+        <th>Floor</th>
+        <th>&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% if house.houseroom_set.count %}
+    {% for room in house.houseroom_set.all %}
+      <tr>
+        <td>
+          {{room.pk}}
+          <input class="form-control" type="hidden" name="type" value="suiteroom" />
+          <input class="form-control" type="hidden" name="pk" value="{{room.pk}}" />
+        </td>
+        <td>
+          <input class="form-control" name="role" id="suiteroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
+        </td>
+        <td>
+          <input class="form-control" name="square_meters" id="suiteroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
+        </td>
+        <td>
+          <input class="form-control" name="floor" id="suiteroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
+        </td>
+        <td>
+          <input class="btn btn-danger" type="button" value="X">
+        </td>
+      </tr>
+    {% endfor %}
+    {% else %}
+      <tr>
+        <td colspan="5">No rooms listed</td>
+      </tr>
+    {% endif %}
+    </tbody>
+  </table>
+  </form>
+  <input class="btn btn-primary" type="button" value="Save Changes"/>
+  <input class="btn btn-success" type="button" value="Add Room"/>
 {% endfor %}
 {% else %}
 <p>No house listed</p>
 {% endif %}
-<input type="button" value="Add House"/>
+<input class="btn btn-success" type="button" value="Add House"/>
 
 
 <!-- Suite information -->
 
-
+<hr />
 <h2>Suite</h2>
 {% if property.suite_set.count %}
 {% for suite in property.suite_set.all %}
   <form id="edit_suite_{{suite.pk}}" action="{% url 'property:edit' property.id %}" method="post">
+    <input class="form-control" type="hidden" name="type" value="suite" />
+    <input class="form-control" type="hidden" name="pk" value="{{suite.pk}}" />
     <div class="suite">
       <h3>Lot {{suite.pk}}</h3>
-      <input type="hidden" name="type" value="suite" />
-      <input type="hidden" name="pk" value="{{suite.pk}}" />
-      <label for="suite_{{suite.pk}}__year">Built in:</label>
-      <input name="year" id="suite_{{suite.pk}}__year" type="number" placeholder="1999" min="0" value="{{suite.year}}" required />
-      <br />
-      
-      <label for="suite_{{suite.pk}}__beds">Bedrooms:</label>
-      <input name="beds" id="suite_{{suite.pk}}__beds" type="number" placeholder="3" min="0" value="{{suite.beds}}" required />
-      <br />
-      
-      <label for="suite_{{suite.pk}}__baths">Bathrooms:</label>
-      <input name="baths" id="suite_{{suite.pk}}__baths" type="number" placeholder="1" min="0" value="{{suite.baths}}" required />
-      <br />
-      
-      <label for="suite_{{suite.pk}}__halfbaths">Half-baths (just toilet + sink):</label>
-      <input name="halfbaths" id="suite_{{suite.pk}}__halfbaths" type="number" placeholder="1" min="0" value="{{suite.halfbaths}}" required />
-      <br />
-      
-      <label for="suite_{{suite.pk}}__square_meters">Square meters:</label>
-      <input name="square_meters" id="suite_{{suite.pk}}__square_meters" type="number" placeholder="200" min="0" step="0.1" value="{{suite.square_meters}}" required />
-      <br />
-      
-      <label for="suite_{{suite.pk}}__floors">Storeys (above ground):</label>
-      <input name="floors" id="suite_{{suite.pk}}__floors" type="number" placeholder="1" min="0" value="{{suite.floors}}" required />
-      <br />
-      
-      <label for="suite_{{suite.pk}}__basements">Storeys (below ground):</label>
-      <input name="basements" id="suite_{{suite.pk}}__basements" type="number" placeholder="1" min="0" value="{{suite.basements}}" required />
-      <br />
-  
-      <label for="suite_{{suite.pk}}__garage">Garage:</label>
-      <select form="edit_suite_{{suite.pk}}" name="province" id="suite_{{suite.pk}}__garage" required>
-      {% for n, garages in garage_choices %}
-        {% if n == suite.garage|default:"0" %}
-        <option value="{{n}}" selected>{{garages}}</option>
-        {% else %}
-        <option value="{{n}}">{{garages}}</option>
-        {% endif %}
-      {% endfor %}
-      </select>
-      <br />
-      
-      <label for="suite_{{suite.pk}}__parking">Parking:</label>
-      <input name="parking" id="suite_{{suite.pk}}__parking" type="text" placeholder="Street, Underground, Driveway" value="{{suite.parking}}" required />
-      <br />
-      
-      <label for="suite_{{suite.pk}}__unit_number">Suite number:</label>
-      <input name="unit_number" id="suite_{{suite.pk}}__unit_number" type="text" placeholder="221b" value="{{suite.unit_number}}" required />
-      <br />
-      
-      <label for="suite_{{suite.pk}}__annual_strata_fee">Strata Fee (annual, estimated):</label>
-      <input name="annual_strata_fee" id="suite_{{suite.pk}}__annual_strata_fee" type="number" min="0" step="0.01" placeholder="4000.00" value="{{suite.annual_strata_fee}}" required />
-      <br />
-      
-      <label for="suite_{{suite.pk}}__pet_rules">Pet rules:</label>
-      <input name="pet_rules" id="suite_{{suite.pk}}__pet_rules" type="text" placeholder="Dogs and cats OK?" value="{{suite.pet_rules}}" required />
-      <br />
-      
-      <label for="suite_{{suite.pk}}__units_in_building">Suites in building:</label>
-      <input name="units_in_building" id="suite_{{suite.pk}}__units_in_building" type="number" min="1" placeholder="50" value="{{suite.units_in_building}}" required />
-      <br />
-      
-      <label for="suite_{{suite.pk}}__building_floors">Storeys in building:</label>
-      <input name="building_floors" id="suite_{{suite.pk}}__building_floors" type="number" min="1" placeholder="5" value="{{suite.building_floors}}" required />
-      <br />
+      <div class="row">
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__year">Built in</label>
+            <input class="form-control" name="year" id="suite_{{suite.pk}}__year" type="number" placeholder="1999" min="0" value="{{suite.year}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__beds">Bedrooms</label>
+            <input class="form-control" name="beds" id="suite_{{suite.pk}}__beds" type="number" placeholder="3" min="0" value="{{suite.beds}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__baths">Bathrooms</label>
+            <input class="form-control" name="baths" id="suite_{{suite.pk}}__baths" type="number" placeholder="1" min="0" value="{{suite.baths}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__halfbaths">Half-baths</label>
+            <input class="form-control" name="halfbaths" id="suite_{{suite.pk}}__halfbaths" type="number" placeholder="1" min="0" value="{{suite.halfbaths}}" required />
+            <small class="form-text text-muted">Toilet and sink</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__square_meters">Square meters</label>
+            <input class="form-control" name="square_meters" id="suite_{{suite.pk}}__square_meters" type="number" placeholder="200" min="0" step="0.1" value="{{suite.square_meters}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__floors">Floors</label>
+            <input class="form-control" name="floors" id="suite_{{suite.pk}}__floors" type="number" placeholder="1" min="0" value="{{suite.floors}}" required />
+            <small class="form-text text-muted">above ground</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__basements">Basements</label>
+            <input class="form-control" name="basements" id="suite_{{suite.pk}}__basements" type="number" placeholder="1" min="0" value="{{suite.basements}}" required />
+            <small class="form-text text-muted">below ground</small>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__garage">Garage</label>
+            <select class="form-control" form="edit_suite_{{suite.pk}}" name="province" id="suite_{{suite.pk}}__garage" required>
+            {% for n, garages in garage_choices %}
+              {% if n == suite.garage|default:"0" %}
+              <option value="{{n}}" selected>{{garages}}</option>
+              {% else %}
+              <option value="{{n}}">{{garages}}</option>
+              {% endif %}
+            {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__parking">Parking</label>
+            <input class="form-control" name="parking" id="suite_{{suite.pk}}__parking" type="text" placeholder="Street, Underground, Driveway" value="{{suite.parking}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__unit_number">Suite number</label>
+            <input class="form-control" name="unit_number" id="suite_{{suite.pk}}__unit_number" type="text" placeholder="221b" value="{{suite.unit_number}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__annual_strata_fee">Strata Fee</label>
+            <div class="input-group">
+              <span class="input-group-addon">$</span>
+              <input class="form-control" name="annual_strata_fee" id="suite_{{suite.pk}}__annual_strata_fee" type="number" min="0" step="0.01" placeholder="4000.00" value="{{suite.annual_strata_fee}}" required />
+            </div>
+            <small class="form-text text-muted">annual, estimated</small>
+          </div>
+        </div>
+        <div class="col-md-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__pet_rules">Pet rules:</label>
+            <input class="form-control" name="pet_rules" id="suite_{{suite.pk}}__pet_rules" type="text" placeholder="Dogs and cats OK?" value="{{suite.pet_rules}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__units_in_building">Suites in building:</label>
+            <input class="form-control" name="units_in_building" id="suite_{{suite.pk}}__units_in_building" type="number" min="1" placeholder="50" value="{{suite.units_in_building}}" required />
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="form-group">
+            <label for="suite_{{suite.pk}}__building_floors">Storeys in building:</label>
+            <input class="form-control" name="building_floors" id="suite_{{suite.pk}}__building_floors" type="number" min="1" placeholder="5" value="{{suite.building_floors}}" required />
+          </div>
+        </div>
+      </div>
 
-      <input name="shared_fitness_room" id="suite_{{suite.pk}}__shared_fitness_room" type="checkbox" {% if suite.shared_fitness_room %}checked {% endif %} />
-      <label for="suite_{{suite.pk}}__shared_fitness_room">Shared Fitness Room</label>
-      <br />
-      
-      <input name="shared_pool" id="suite_{{suite.pk}}__shared_pool" type="checkbox" {% if suite.shared_pool %}checked {% endif %} />
-      <label for="suite_{{suite.pk}}__shared_pool">Shared Pool</label>
-      <br />
-      
-      <input name="shared_party_room" id="suite_{{suite.pk}}__shared_party_room" type="checkbox" {% if suite.shared_party_room %}checked {% endif %} />
-      <label for="suite_{{suite.pk}}__shared_party_room">Shared Party Room</label>
-      <br />
-      
-      <input name="shared_private_courtyard" id="suite_{{suite.pk}}__shared_private_courtyard" type="checkbox" {% if suite.shared_private_courtyard %}checked {% endif %} />
-      <label for="suite_{{suite.pk}}__shared_private_courtyard">Shared Private Courtyard</label>
-      <br />
-      
-      <input name="shared_laundry" id="suite_{{suite.pk}}__shared_laundry" type="checkbox" {% if suite.shared_laundry %}checked {% endif %} />
-      <label for="suite_{{suite.pk}}__shared_laundry">Shared Laundry Room</label>
-      <br />
+      <div class="row">
+        <div class="col-md-6 col-12 align-self-center">
+          <div class="form-check">
+            <label class="form-check-label" for="suite_{{suite.pk}}__shared_fitness_room">
+              <input class="form-check-input" name="shared_fitness_room" id="suite_{{suite.pk}}__shared_fitness_room" type="checkbox" {% if suite.shared_fitness_room %}checked {% endif %} />
+              Shared Fitness Room
+            </label>
+          </div>
+        </div>
+        <div class="col-md-6 col-12 align-self-center">
+          <div class="form-check">
+            <label class="form-check-label" for="suite_{{suite.pk}}__shared_pool">
+              <input class="form-check-input" name="shared_pool" id="suite_{{suite.pk}}__shared_pool" type="checkbox" {% if suite.shared_pool %}checked {% endif %} />
+              Shared Pool
+            </label>
+          </div>
+        </div>
+        <div class="col-md-6 col-12 align-self-center">
+          <div class="form-check">
+            <label class="form-check-label" for="suite_{{suite.pk}}__shared_party_room">
+              <input class="form-check-input" name="shared_party_room" id="suite_{{suite.pk}}__shared_party_room" type="checkbox" {% if suite.shared_party_room %}checked {% endif %} />
+              Shared Party Room
+            </label>
+          </div>
+        </div>
+        <div class="col-md-6 col-12 align-self-center">
+          <div class="form-check">
+            <label class="form-check-label" for="suite_{{suite.pk}}__shared_private_courtyard">
+              <input class="form-check-input" name="shared_private_courtyard" id="suite_{{suite.pk}}__shared_private_courtyard" type="checkbox" {% if suite.shared_private_courtyard %}checked {% endif %} />
+              Shared Private Courtyard
+            </label>
+          </div>
+        </div>
+        <div class="col-md-6 col-12 align-self-center">
+          <div class="form-check">
+            <label class="form-check-label" for="suite_{{suite.pk}}__shared_laundry">
+              <input class="form-check-input" name="shared_laundry" id="suite_{{suite.pk}}__shared_laundry" type="checkbox" {% if suite.shared_laundry %}checked {% endif %} />
+              Shared Laundry Room
+            </label>
+          </div>
+        </div>
+      </div>
 
-      <label for="suite_{{suite.pk}}__extras">Extra features (pool, security system, fireplace):</label>
-      <br />
-      <textarea name="extras" id="suite_{{suite.pk}}__extras" rows=3 cols=70 form="edit_suite_{{suite.pk}}" required>{{suite.extras}}</textarea>
-      <br />
+      <div class="form-group">
+        <label for="suite_{{suite.pk}}__extras">Extra features (pool, security system, fireplace):</label>
+        <textarea class="form-control" name="extras" id="suite_{{suite.pk}}__extras" rows=3 cols=70 form="edit_suite_{{suite.pk}}" required>{{suite.extras}}</textarea>
+      </div>
 
-      <input type="submit" value="Save Changes" />
+      <input class="btn btn-primary" type="submit" value="Save Changes" />
     </div>
   </form>
   <h3>Rooms in the suite:</h3>
-  {% if suite.suiteroom_set.count %}
-  {% for room in suite.suiteroom_set.all %}
-    <form id="edit_suiteroom_{{room.pk}}" action="{% url 'property:edit' property.id %}" method="post">
-      <div class="suite room">
-        <h4>Room {{room.pk}}</h4>
-        <input type="hidden" name="type" value="suiteroom" />
-        <input type="hidden" name="pk" value="{{room.pk}}" />
-        <label for="suiteroom_{{room.pk}}__square_meters">Square meters:</label>
-        <input name="square_meters" id="suiteroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
-        <br />
-  
-        <label for="suiteroom_{{room.pk}}__floor">Floor:</label>
-        <input name="floor" id="suiteroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
-        <br />
-  
-        <label for="suiteroom_{{room.pk}}__role">Role:</label>
-        <input name="role" id="suiteroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
-        <br />
-  
-        <input type="submit" value="Save Changes" />
-      </div>
-    </form>
-  {% endfor %}
-  {% endif %}
-  <input type="button" value="Add Room"/>
+  <form id="edit_suiterooms" action="{% url 'property:edit' property.id %}" method="post">
+  <table class="table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Room role</th>
+        <th>Size (m²)</th>
+        <th>Floor</th>
+        <th>&nbsp;</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% if suite.suiteroom_set.count %}
+    {% for room in suite.suiteroom_set.all %}
+      <tr>
+        <td>
+          {{room.pk}}
+          <input class="form-control" type="hidden" name="type" value="suiteroom" />
+          <input class="form-control" type="hidden" name="pk" value="{{room.pk}}" />
+        </td>
+        <td>
+          <input class="form-control" name="role" id="suiteroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
+        </td>
+        <td>
+          <input class="form-control" name="square_meters" id="suiteroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
+        </td>
+        <td>
+          <input class="form-control" name="floor" id="suiteroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
+        </td>
+        <td>
+          <input class="btn btn-danger" type="button" value="X">
+        </td>
+      </tr>
+    {% endfor %}
+    {% else %}
+      <tr>
+        <td colspan="5">No rooms listed</td>
+      </tr>
+    {% endif %}
+    </tbody>
+  </table>
+  </form>
+  <input class="btn btn-primary" type="submit" value="Save Changes" />
+  <input class="btn btn-success" type="button" value="Add Room"/>
 {% endfor %}
 {% else %}
 <p>No suite listed</p>
 {% endif %}
-<input type="button" value="Add Suite"/>
+<input class="btn btn-success" type="button" value="Add Suite"/>
 
 
 <!-- Seller's Contact Info -->
 
+<hr />
 <h2>Seller's Contact Info: (<a href="{% url 'property:account' %}">edit</a>)</h2>
 {{ property.owner.message }}
 <ul>
@@ -441,5 +629,6 @@
   <li>Mailing Address: {{property.owner.mail}}</li>
 {% endif %}
 </ul>
+</div>
 </body>
 </html>
