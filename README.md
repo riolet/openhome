@@ -35,7 +35,7 @@ exit
 
 Configure local project settings, by making file: openhome/openhome/local_settings.py and filling it with the text below.
 
-Port number defaults to 5432 and is found in /etc/postgresql/<version>/main/postgresql.conf
+Port number defaults to 5432 and is found in /etc/postgresql/&lt;version&gt;/main/postgresql.conf
 
 Database, user, and password values must match the previous step.
 ```python

@@ -15,7 +15,7 @@ class HomeView(generic.ListView):
 
     def get_queryset(self):
         # The 5 most recently published properties
-        return Property.objects.order_by('-publish_stamp').filter(Q(status='A') | Q(status='P'))[:5]
+        return Property.objects.order_by('-publish_stamp').filter(Q(status='A') | Q(status='P'))[:10]
 
 
 class DetailView(generic.DetailView):
