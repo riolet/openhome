@@ -203,11 +203,8 @@ class EditView:
         # '12_role': 'unspecified',
         # '12_square_meters': '4',
         # 'type': 'houseroom'}
-        print("updates: {}".format(updates))
         keys = [k.partition("_")[0] for k in updates.keys()]
-        print("keys A: {}".format(keys))
         keys = {k for k in keys if k.isnumeric()}
-        print("keys B: {}".format(keys))
         room_updates = {}
         for key in keys:
             if model == 'houseroom':
@@ -225,13 +222,16 @@ class EditView:
                 'square_meters': updates.get("{}_square_meters".format(key), room.square_meters),
                 'role': updates.get("{}_role".format(key), room.role)
             }
-            print("\nfor loop updates: {}".format(updates))
-            print("\nfixed params: {}".format(fixed_params))
-            room.update(fixed_params)
-            room.normalize_fields()
-            room.full_clean()
-            room.save()
-            room_updates[key] = room.export()
+            try:
+                room.update(fixed_params)
+                room.normalize_fields()
+                room.full_clean()
+                room.save()
+                room_updates[key] = room.export()
+            except ValueError:
+                errors.append("Please fill in all the fields.")
+            except Exception as e:
+                errors.append("Could not update room. ({})".format(e))
 
         successes['type'] = model
         successes['pk'] = pk

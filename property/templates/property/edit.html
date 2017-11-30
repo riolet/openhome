@@ -36,8 +36,12 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
 <h1>Edit Listing</h1>
 
-<h2>Property at {{property.street_address}}</h2>
-<input class="delitem btn btn-danger" type="button" data-model="property" data-pk="{{property.pk}}" value="Delete Entire Listing">
+<div class="card">
+  <div class="card-header">
+    <h2 class="float-left">Property at {{property.street_address}}</h2>
+    <input class="delitem btn btn-danger float-right" type="button" data-model="property" data-pk="{{property.pk}}" value="Delete Entire Listing">
+  </div>
+</div>
 <form id="edit_property" action="{% url 'property:edit' property.id %}" method="post">
   <input type="hidden" name="type" value="property" />
   <input type="hidden" name="pk" id="property_id" value="{{property.pk}}" />
@@ -309,12 +313,9 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
         <p>No other structures.</p>
       {% endif %}
       <input class="additem btn btn-success" type="button" data-model="structure" data-parent="{{lot.pk}}" value="Add Structure" /><br />
-      {% endfor %}
     </div>
   </div>
-
-
-
+{% endfor %}
 {% else %}
 <p>No land included.</p>
 {% endif %}
@@ -432,7 +433,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
                 <th>Remove</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="house_{{house.pk}}_rooms">
             {% if house.houseroom_set.count %}
             {% for room in house.houseroom_set.all %}
               <tr id="houseroom_{{room.pk}}_card">
@@ -664,7 +665,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
                   <th>Remove</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="suite_{{suite.pk}}_rooms">
               {% if suite.suiteroom_set.count %}
               {% for room in suite.suiteroom_set.all %}
                 <tr id="suiteroom_{{room.pk}}_card">
@@ -735,5 +736,40 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 </div>
 
 </div><!-- container -->
+
+<script>
+(function () {
+  let templates = {};
+  houseroom = '<td> \
+        <input class="form-control" name="000_role" id="houseroom_000__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." required /> \
+      </td> \
+      <td> \
+        <div class="input-group"> \
+          <input class="form-control" name="000_square_meters" id="houseroom_000__square_meters" type="number" placeholder="13.6" min="0" step="0.1" required /> \
+          <span class="input-group-addon">m²</span> \
+        </div> \
+      </td> \
+      <td> \
+        <input class="form-control" name="000_floor" id="houseroom_000__floor" type="number" placeholder="1 is ground, -1 is basement" required /> \
+      </td> \
+      <td> \
+        <input class="delitem btn btn-danger" type="button" data-model="houseroom" data-pk="000" value="X"> \
+      </td>';
+
+  templates.houseroom = houseroom;
+  templates.suiteroom = houseroom.replace(/houseroom/g, 'suiteroom');
+  window.templates = templates;
+}());
+</script>
+<div class="hidden blanks">
+  <div id="blank_house"></div>
+  <div id="blank_houseroom">
+
+  </div>
+  <div id="blank_suite"></div>
+  <div id="blank_lot"></div>
+  <div id="blank_structure"></div>
+</div>
+
 </body>
 </html>

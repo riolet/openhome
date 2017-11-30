@@ -38,7 +38,10 @@ function objectifyForm(formElement) {
     prop.init = function () {
         prop.property_id = document.getElementById("property_id").value;
         prop.edit_endpoint = document.getElementById("edit_property").action;
+        prop.assign_button_clicks();
+    };
 
+    prop.assign_button_clicks = function () {
         //Hook up handlers to buttons everywhere!
         $(".saveform").click(prop.save_form);
         $(".additem").click(prop.add_item);
@@ -93,8 +96,39 @@ function objectifyForm(formElement) {
             pk: btn.dataset.parent,
         };
         //prop.test_action(data);
-        prop.send_post(data);
+        prop.send_post(data, function (response) {
+            let parsed = JSON.parse(response);
+            if (parsed.result === "success") {
+                prop.add_html(data.pk, parsed.successes.model, parsed.successes.pk)
+            }
+        });
         // TODO: on success, Add new blank elements into the form, using the new key
+    };
+
+    prop.add_html = function(parent_key, model, child_key) {
+        // find host object
+        console.log("parent_key", parent_key);
+        console.log("model", model);
+        console.log("child_key", child_key);
+        let host;
+        let markup;
+        let child;
+        if (model === "houseroom") {
+            host = document.getElementById('house_' + parent_key + "_rooms");
+            markup = templates.houseroom.replace(/000/g, child_key);
+            child = document.createElement("tr");
+            child.id = "houseroom_" + child_key + "_card";
+            child.innerHTML = markup;
+            host.appendChild(child);
+        } else if (model === "suiteroom") {
+            host = document.getElementById('suite_' + parent_key + "_rooms");
+            markup = templates.suiteroom.replace(/000/g, child_key);
+            child = document.createElement("tr");
+            child.id = "suiteroom_" + child_key + "_card";
+            child.innerHTML = markup;
+            host.appendChild(child);
+        }
+        props.assign_button_clicks();
     };
 
     prop.remove_item = function (action) {
@@ -107,8 +141,8 @@ function objectifyForm(formElement) {
         };
         //prop.test_action(data);
         prop.send_post(data, function (response) {
-            let data = JSON.parse(response);
-            if (data.result === "success") {
+            let parsed = JSON.parse(response);
+            if (parsed.result === "success") {
                 prop.remove_html(data.model, data.pk);
             }
         });
