@@ -71,15 +71,13 @@ class EditView:
                 errors.append('Cannot add a {} to your listing.'.format(model))
                 return
         except (Suite.DoesNotExist, Lot.DoesNotExist, House.DoesNotExist):
-            errors.append("Cannot listing to update. Try saving your edits and refreshing the page.")
+            errors.append("Cannot find listing to update. Try saving your edits and refreshing the page.")
             return
 
         if not self.item_is_owned(parent):
             errors.append("Not authorized to edit this listing")
             return
 
-        print("Adding {} to {}".format(model, parent))
-        new_component = None
         if model == 'lot':
             new_component = Lot.construct_default(parent)
         elif model == 'house':
@@ -103,11 +101,86 @@ class EditView:
             errors.append("Error creating {}: {}".format(model, e))
             return
 
-
+        print("Adding {} to {}".format(model, parent))
         successes['action'] = 'added'
         successes['model'] = model
         successes['pk'] = new_component.id
         return
+
+    def remove_component(self, model, key, errors, successes):
+        try:
+            if model == 'lot':
+                deathrow = Lot.objects.get(pk=key)
+            elif model == 'house':
+                deathrow = House.objects.get(pk=key)
+            elif model == 'suite':
+                deathrow = Suite.objects.get(pk=key)
+            elif model == "suiteroom":
+                deathrow = SuiteRoom.objects.get(pk=key)
+            elif model == "houseroom":
+                deathrow = HouseRoom.objects.get(pk=key)
+            elif model == "structure":
+                deathrow = Structure.objects.get(pk=key)
+            else:
+                errors.append('Cannot delete the {} in your listing.'.format(model))
+                return
+        except (Suite.DoesNotExist, Lot.DoesNotExist, House.DoesNotExist):
+            errors.append("Cannot find listing to remove. Try saving your edits and refreshing the page.")
+            return
+
+        if not self.item_is_owned(deathrow):
+            errors.append("Not authorized to edit this listing")
+            return
+
+        print("Removing {} with id {}".format(model, key))
+        deathrow.delete()
+        successes['action'] = 'removed'
+        successes['model'] = model
+        successes['pk'] = key
+        return
+
+    def update_component(self, model, errors, successes, pk, **updates):
+        try:
+            if model == 'property':
+                comp = Property.objects.get(pk=pk)
+            elif model == 'lot':
+                comp = Lot.objects.get(pk=pk)
+            elif model == 'house':
+                comp = House.objects.get(pk=pk)
+            elif model == 'suite':
+                comp = Suite.objects.get(pk=pk)
+            elif model == "suiteroom":
+                comp = SuiteRoom.objects.get(pk=pk)
+            elif model == "houseroom":
+                comp = HouseRoom.objects.get(pk=pk)
+            elif model == "structure":
+                comp = Structure.objects.get(pk=pk)
+            else:
+                errors.append('Cannot update the {} in your listing.'.format(model))
+                return
+        except (Suite.DoesNotExist, Lot.DoesNotExist, House.DoesNotExist):
+            errors.append("Cannot find listing to edit. Try refreshing the page.")
+            return
+
+        if not self.item_is_owned(comp):
+            errors.append("Not authorized to edit this listing")
+            return
+
+        try:
+            comp.update(updates)
+            comp.normalize_fields()
+            comp.full_clean()
+            comp.save()
+        except Exception as e:
+            errors.append("{}".format(e))
+            return
+
+        print("Updating {} with id {}".format(model, pk))
+        print("Update: {}".format(updates))
+        successes['type'] = model
+        successes['pk'] = pk
+        # successes['updated_model'] = serializers.serialize('json', obj)
+        successes['updated_model'] = comp.export
 
     def post_method(self):
         if self.property.owner != self.user:
@@ -134,20 +207,12 @@ class EditView:
             if action_type == 'add':
                 self.add_component(model=decoded['model'], parent_id=decoded['pk'], errors=errors, successes=successes)
             elif action_type == 'remove':
-                # TODO: SECURITY: verify permissions to perform removal
-                print("Removing {} with id {}".format(decoded['model'], decoded['pk']))
-                successes['action'] = 'removed'
-                successes['model'] = decoded['model']
-                successes['pk'] = decoded['pk']
+                self.remove_component(model=decoded['model'], key=decoded['pk'], errors=errors, successes=successes)
             else:
                 errors.append('Error. Did not understand action {}'.format(action_type))
         elif request_type in ['property', 'lot', 'structure', 'house', 'houseroom', 'suite', 'suiteroom']:
             # TODO: SECURITY: verify permissions to perform update
-            print("Updating {} with id {}".format(request_type, decoded['pk']))
-            successes['type'] = decoded['type']
-            successes['pk'] = decoded['pk']
-            # successes['updated_model'] = serializers.serialize('json', obj)
-            successes['updated_model'] = '[{}]'
+            self.update_component(model=request_type, errors=errors, successes=successes, **decoded)
         else:
             errors.append('Error. Did not understand request type {}'.format(decoded['type']))
 

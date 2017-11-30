@@ -193,8 +193,56 @@ class Lot(models.Model):
     width = models.FloatField()
     # measurement of how far back from street property extends
     depth = models.FloatField()
-    description = models.TextField()
     zoning = models.CharField(max_length=100, default="residential")
+    description = models.TextField()
+
+    def normalize_fields(self):
+        """
+        Trim spaces and newlines, convert to numbers, and capitalize as needed.
+
+        user-submitted data in fields:
+            status
+            description
+            price
+            property_tax
+            property_type
+            country
+            province
+            region
+            city
+            neighborhood
+            street_address
+            postal_code
+            latitude
+            longitude
+        """
+        self.square_meters = float(self.square_meters)
+        self.width = float(self.width)
+        self.depth = float(self.depth)
+        self.zoning = self.zoning.strip()
+        self.description = self.description.strip()
+
+    def update(self, params):
+        if 'square_meters' in params:
+            self.square_meters = params['square_meters']
+        if 'width' in params:
+            self.width = params['width']
+        if 'depth' in params:
+            self.depth = params['depth']
+        if 'zoning' in params:
+            self.zoning = params['zoning']
+        if 'description' in params:
+            self.description = params['description']
+
+    def export(self):
+        data = {
+            'square_meters': self.square_meters,
+            'width': self.width,
+            'depth': self.depth,
+            'zoning': self.zoning,
+            'description': self.description
+        }
+        return data
 
     @staticmethod
     def construct_default(property):
@@ -242,6 +290,74 @@ class House(models.Model):
     parking = models.CharField(max_length=100)
     # catch-all for additional features such as alarm system, fireplace, pool, sauna, etc.
     extras = models.TextField(null=False, blank=True)
+
+    def normalize_fields(self):
+        """
+        Trim spaces and newlines, convert to numbers, and capitalize as needed.
+
+        user-submitted data in fields:
+            status
+            description
+            price
+            property_tax
+            property_type
+            country
+            province
+            region
+            city
+            neighborhood
+            street_address
+            postal_code
+            latitude
+            longitude
+        """
+        self.year = int(self.year)
+        self.beds = int(self.beds)
+        self.baths = int(self.baths)
+        self.halfbaths = int(self.halfbaths)
+        self.square_meters = float(self.square_meters)
+        self.floors = int(self.floors)
+        self.basements = int(self.basements)
+        self.garage = self.garage.strip()[:1]
+        self.parking = self.parking.strip()
+        self.extras = self.extras.strip()
+
+    def update(self, params):
+        if 'year' in params:
+            self.year = params['year']
+        if 'beds' in params:
+            self.beds = params['beds']
+        if 'baths' in params:
+            self.baths = params['baths']
+        if 'halfbaths' in params:
+            self.halfbaths = params['halfbaths']
+        if 'square_meters' in params:
+            self.square_meters = params['square_meters']
+        if 'floors' in params:
+            self.floors = params['floors']
+        if 'basements' in params:
+            self.basements = params['basements']
+        if 'garage' in params:
+            self.garage = params['garage']
+        if 'parking' in params:
+            self.parking = params['parking']
+        if 'extras' in params:
+            self.extras = params['extras']
+
+    def export(self):
+        data = {
+            'year': self.year,
+            'beds': self.beds,
+            'baths': self.baths,
+            'halfbaths': self.halfbaths,
+            'square_meters': self.square_meters,
+            'floors': self.floors,
+            'basements': self.basements,
+            'garage': self.garage,
+            'parking': self.parking,
+            'extras': self.extras,
+        }
+        return data
 
     @staticmethod
     def construct_default(property):
@@ -307,6 +423,104 @@ class Suite(models.Model):
     units_in_building = models.IntegerField()
     building_floors = models.IntegerField()
 
+    def normalize_fields(self):
+        """
+        Trim spaces and newlines, convert to numbers, and capitalize as needed.
+
+        user-submitted data in fields:
+            status
+            description
+            price
+            property_tax
+            property_type
+            country
+            province
+            region
+            city
+            neighborhood
+            street_address
+            postal_code
+            latitude
+            longitude
+        """
+        self.year = int(self.year)
+        self.beds = int(self.beds)
+        self.baths = int(self.baths)
+        self.halfbaths = int(self.halfbaths)
+        self.square_meters = float(self.square_meters)
+        self.floors = int(self.floors)
+        self.basements = int(self.basements)
+        self.garage = self.garage.strip()[:1]
+        self.parking = self.parking.strip()
+        self.extras = self.extras.strip()
+        self.unit_number = self.unit_number.strip()[:10]
+        self.annual_strata_fee = float(self.annual_strata_fee)
+        self.pet_rules = self.pet_rules.strip()[:100]
+        self.shared_fitness_room = bool(self.shared_fitness_room)
+        self.shared_pool = bool(self.shared_pool)
+        self.shared_party_room = bool(self.shared_party_room)
+        self.shared_private_courtyard = bool(self.shared_private_courtyard)
+        self.shared_laundry = bool(self.shared_laundry)
+        self.units_in_building = int(self.units_in_building)
+        self.building_floors = int(self.building_floors)
+
+    def update(self, params):
+        if 'year' in params:
+            self.year = params['year']
+        if 'beds' in params:
+            self.beds = params['beds']
+        if 'baths' in params:
+            self.baths = params['baths']
+        if 'halfbaths' in params:
+            self.halfbaths = params['halfbaths']
+        if 'square_meters' in params:
+            self.square_meters = params['square_meters']
+        if 'floors' in params:
+            self.floors = params['floors']
+        if 'basements' in params:
+            self.basements = params['basements']
+        if 'garage' in params:
+            self.garage = params['garage']
+        if 'parking' in params:
+            self.parking = params['parking']
+        if 'extras' in params:
+            self.extras = params['extras']
+        if 'unit_number' in params:
+            self.unit_number = params['unit_number']
+        if 'annual_strata_fee' in params:
+            self.annual_strata_fee = params['annual_strata_fee']
+        if 'pet_rules' in params:
+            self.pet_rules = params['pet_rules']
+        if 'shared_fitness_room' in params:
+            self.shared_fitness_room = params['shared_fitness_room']
+        if 'shared_pool' in params:
+            self.shared_pool = params['shared_pool']
+        if 'shared_party_room' in params:
+            self.shared_party_room = params['shared_party_room']
+        if 'shared_private_courtyard' in params:
+            self.shared_private_courtyard = params['shared_private_courtyard']
+        if 'shared_laundry' in params:
+            self.shared_laundry = params['shared_laundry']
+        if 'units_in_building' in params:
+            self.units_in_building = params['units_in_building']
+        if 'building_floors' in params:
+            self.building_floors = params['building_floors']
+
+    def export(self):
+        data = {
+            'year': self.year,
+            'beds': self.beds,
+            'baths': self.baths,
+            'halfbaths': self.halfbaths,
+            'square_meters': self.square_meters,
+            'floors': self.floors,
+            'basements': self.basements,
+            'garage': self.garage,
+            'parking': self.parking,
+            'extras': self.extras,
+        }
+        return data
+
     @staticmethod
     def construct_default(property):
         s = Suite()
@@ -347,6 +561,54 @@ class Structure(models.Model):
     height = models.FloatField()
     description = models.TextField()
 
+    def normalize_fields(self):
+        """
+        Trim spaces and newlines, convert to numbers, and capitalize as needed.
+
+        user-submitted data in fields:
+            status
+            description
+            price
+            property_tax
+            property_type
+            country
+            province
+            region
+            city
+            neighborhood
+            street_address
+            postal_code
+            latitude
+            longitude
+        """
+        self.square_meters = float(self.square_meters)
+        self.width = float(self.width)
+        self.depth = float(self.depth)
+        self.height = float(self.height)
+        self.description = self.description.strip()
+
+    def update(self, params):
+        if 'square_meters' in params:
+            self.square_meters = params['square_meters']
+        if 'width' in params:
+            self.width = params['width']
+        if 'depth' in params:
+            self.depth = params['depth']
+        if 'height' in params:
+            self.height = params['height']
+        if 'description' in params:
+            self.description = params['description']
+
+    def export(self):
+        data = {
+            'square_meters': self.square_meters,
+            'width': self.width,
+            'height': self.height,
+            'depth': self.depth,
+            'description': self.description
+        }
+        return data
+
     @staticmethod
     def construct_default(lot):
         s = Structure()
@@ -372,6 +634,46 @@ class HouseRoom(models.Model):
     # bedroom, bathroom, kitchen, storage, multi-purpose, ...
     role = models.CharField(max_length=100)
 
+    def normalize_fields(self):
+        """
+        Trim spaces and newlines, convert to numbers, and capitalize as needed.
+
+        user-submitted data in fields:
+            status
+            description
+            price
+            property_tax
+            property_type
+            country
+            province
+            region
+            city
+            neighborhood
+            street_address
+            postal_code
+            latitude
+            longitude
+        """
+        self.square_meters = float(self.square_meters)
+        self.floor = int(self.floor)
+        self.role = self.role.strip()[:100]
+
+    def update(self, params):
+        if 'square_meters' in params:
+            self.square_meters = params['square_meters']
+        if 'floor' in params:
+            self.floor = params['floor']
+        if 'role' in params:
+            self.role = params['role']
+
+    def export(self):
+        data = {
+            'square_meters': self.square_meters,
+            'floor': self.floor,
+            'role': self.role,
+        }
+        return data
+
     @staticmethod
     def construct_default(house):
         r = HouseRoom()
@@ -394,6 +696,46 @@ class SuiteRoom(models.Model):
     floor = models.IntegerField()
     # bedroom, bathroom, kitchen, storage, multi-purpose, ...
     role = models.CharField(max_length=100)
+
+    def normalize_fields(self):
+        """
+        Trim spaces and newlines, convert to numbers, and capitalize as needed.
+
+        user-submitted data in fields:
+            status
+            description
+            price
+            property_tax
+            property_type
+            country
+            province
+            region
+            city
+            neighborhood
+            street_address
+            postal_code
+            latitude
+            longitude
+        """
+        self.square_meters = float(self.square_meters)
+        self.floor = int(self.floor)
+        self.role = self.role.strip()[:100]
+
+    def update(self, params):
+        if 'square_meters' in params:
+            self.square_meters = params['square_meters']
+        if 'floor' in params:
+            self.floor = params['floor']
+        if 'role' in params:
+            self.role = params['role']
+
+    def export(self):
+        data = {
+            'square_meters': self.square_meters,
+            'floor': self.floor,
+            'role': self.role,
+        }
+        return data
 
     @staticmethod
     def construct_default(suite):

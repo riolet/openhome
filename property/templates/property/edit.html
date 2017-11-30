@@ -187,8 +187,8 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 {% for lot in property.lot_set.all %}
   <form id="edit_lot_{{lot.pk}}" action="{% url 'property:edit' property.id %}" method="post">
     <div class="lot">
-    <input class="form-control" type="hidden" name="type" value="lot" />
-    <input class="form-control" type="hidden" name="pk" value="{{lot.pk}}" />
+      <input class="form-control" type="hidden" name="type" value="lot" />
+      <input class="form-control" type="hidden" name="pk" value="{{lot.pk}}" />
       <h3>Lot {{lot.pk}}</h3>
       <div class="row">
         <div class="col-sm">
@@ -227,29 +227,41 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
   {% for structure in lot.structure_set.all %}
     <form id="edit_structure_{{structure.pk}}" action="{% url 'property:edit' property.id %}" method="post">
       <div class="structure">
-        <h4>Structure {{structure.pk}}</h4>
         <input class="form-control" type="hidden" name="type" value="structure" />
         <input class="form-control" type="hidden" name="pk" value="{{structure.pk}}" />
-        <label for="structure_{{structure.pk}}__square_meters">Square meters:</label>
-        <input class="form-control" name="square_meters" id="structure_{{structure.pk}}__square_meters" type="number" placeholder="6" min="0" step="0.1" value="{{structure.square_meters}}" required />
-        <br />
-  
-        <label for="structure_{{structure.pk}}__width">Width:</label>
-        <input class="form-control" name="width" id="structure_{{structure.pk}}__width" type="number" placeholder="3.0" min="0" step="0.1" value="{{structure.width}}" required />
-        <br />
-  
-        <label for="structure_{{structure.pk}}__depth">Depth:</label>
-        <input class="form-control" name="depth" id="structure_{{structure.pk}}__depth" type="number" placeholder="2.0" min="0" step="0.1" value="{{structure.depth}}" required />
-        <br />
-  
-        <label for="structure_{{structure.pk}}__height">Height:</label>
-        <input class="form-control" name="height" id="structure_{{structure.pk}}__height" type="number" placeholder="2.5" min="0" step="0.1" value="{{structure.height}}" required />
-        <br />
-  
-        <label for="structure_{{structure.pk}}__description">Description of structure:</label>
-        <br />
-        <textarea class="form-control" name="description" id="structure_{{structure.pk}}__description" rows=3 cols=70 form="edit_structure_{{structure.pk}}" required>{{structure.description}}</textarea>
-        <br />
+        <h4>Structure {{structure.pk}}</h4>
+        <div class="row">
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="form-group">
+              <label for="structure_{{structure.pk}}__square_meters">Square meters:</label>
+              <input class="form-control" name="square_meters" id="structure_{{structure.pk}}__square_meters" type="number" placeholder="6" min="0" step="0.1" value="{{structure.square_meters}}" required />
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="form-group">
+              <label for="structure_{{structure.pk}}__width">Width:</label>
+              <input class="form-control" name="width" id="structure_{{structure.pk}}__width" type="number" placeholder="3.0" min="0" step="0.1" value="{{structure.width}}" required />
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="form-group">
+              <label for="structure_{{structure.pk}}__depth">Depth:</label>
+              <input class="form-control" name="depth" id="structure_{{structure.pk}}__depth" type="number" placeholder="2.0" min="0" step="0.1" value="{{structure.depth}}" required />
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 col-12">
+            <div class="form-group">
+              <label for="structure_{{structure.pk}}__height">Height:</label>
+              <input class="form-control" name="height" id="structure_{{structure.pk}}__height" type="number" placeholder="2.5" min="0" step="0.1" value="{{structure.height}}" required />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="structure_{{structure.pk}}__description">Description of structure:</label>
+          <textarea class="form-control" name="description" id="structure_{{structure.pk}}__description" rows=3 cols=70 form="edit_structure_{{structure.pk}}" required>{{structure.description}}</textarea>
+        </div>
+
         <input class="saveform btn btn-primary" type="button" value="Save Changes" />
       </div>
     </form>
