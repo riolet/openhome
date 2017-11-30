@@ -36,8 +36,8 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
 <h1>Property at {{property.street_address}}</h1>
 <form id="edit_property" action="{% url 'property:edit' property.id %}" method="post">
-  <input class="form-control" type="hidden" name="type" value="property" />
-  <input class="form-control" type="hidden" name="pk" id="property_id" value="{{property.pk}}" />
+  <input type="hidden" name="type" value="property" />
+  <input type="hidden" name="pk" id="property_id" value="{{property.pk}}" />
 
 
   <!--property_type-->
@@ -187,8 +187,8 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 {% for lot in property.lot_set.all %}
   <form id="edit_lot_{{lot.pk}}" action="{% url 'property:edit' property.id %}" method="post">
     <div class="lot">
-      <input class="form-control" type="hidden" name="type" value="lot" />
-      <input class="form-control" type="hidden" name="pk" value="{{lot.pk}}" />
+      <input type="hidden" name="type" value="lot" />
+      <input type="hidden" name="pk" value="{{lot.pk}}" />
       <h3>Lot {{forloop.counter}}</h3>
       <div class="row">
         <div class="col-sm">
@@ -227,8 +227,8 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
   {% for structure in lot.structure_set.all %}
     <form id="edit_structure_{{structure.pk}}" action="{% url 'property:edit' property.id %}" method="post">
       <div class="structure">
-        <input class="form-control" type="hidden" name="type" value="structure" />
-        <input class="form-control" type="hidden" name="pk" value="{{structure.pk}}" />
+        <input type="hidden" name="type" value="structure" />
+        <input type="hidden" name="pk" value="{{structure.pk}}" />
         <h4>Structure {{forloop.counter}}</h4>
         <div class="row">
           <div class="col-md-3 col-sm-6 col-12">
@@ -284,8 +284,8 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 {% if property.house_set.count %}
 {% for house in property.house_set.all %}
   <form id="edit_house_{{house.pk}}" action="{% url 'property:edit' property.id %}" method="post">
-    <input class="form-control" type="hidden" name="type" value="house" />
-    <input class="form-control" type="hidden" name="pk" value="{{house.pk}}" />
+    <input type="hidden" name="type" value="house" />
+    <input type="hidden" name="pk" value="{{house.pk}}" />
     <div class="house">
       <h3>House {{forloop.counter}}</h3>
       <div class="row">
@@ -388,7 +388,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
           <input class="form-control" name="{{room.pk}}_floor" id="houseroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
         </td>
         <td>
-          <input class="btn btn-danger" type="button" data-pk="{{room.pk}}" value="X">
+          <input class="btn btn-danger" type="button" data-model="houseroom" data-pk="{{room.pk}}" value="X">
         </td>
       </tr>
     {% endfor %}
@@ -399,10 +399,11 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
     {% endif %}
     </tbody>
   </table>
-  <input class="form-control" type="hidden" name="type" value="suiteroom" />
+  <input type="hidden" name="type" value="houseroom" />
+  <input type="hidden" name="pk" value="{{house.pk}}" />
   <input class="saveform btn btn-primary" type="button" value="Save Changes"/>
+  <input class="additem btn btn-success" type="button" data-model="houseroom" data-parent="{{house.pk}}" value="Add Room"/>
   </form>
-  <input class="additem btn btn-success" type="button" data-model="houseroom" data-parent="{{house.pk}}" value="Add Room"/><br />
 {% endfor %}
 {% else %}
 <p>No house listed</p>
@@ -417,8 +418,8 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 {% if property.suite_set.count %}
 {% for suite in property.suite_set.all %}
   <form id="edit_suite_{{suite.pk}}" action="{% url 'property:edit' property.id %}" method="post">
-    <input class="form-control" type="hidden" name="type" value="suite" />
-    <input class="form-control" type="hidden" name="pk" value="{{suite.pk}}" />
+    <input type="hidden" name="type" value="suite" />
+    <input type="hidden" name="pk" value="{{suite.pk}}" />
     <div class="suite">
       <h3>Suite {{forloop.counter}}</h3>
       <div class="row">
@@ -576,45 +577,45 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
   </form>
   <h3>Rooms in the suite:</h3>
   <form id="edit_suiterooms" action="{% url 'property:edit' property.id %}" method="post">
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Room role</th>
-        <th>Size (m²)</th>
-        <th>Floor</th>
-        <th>Remove</th>
-      </tr>
-    </thead>
-    <tbody>
-    {% if suite.suiteroom_set.count %}
-    {% for room in suite.suiteroom_set.all %}
-      <tr>
-        <td>
-          <input class="form-control" type="hidden" name="type" value="suiteroom" />
-          <input class="form-control" type="hidden" name="pk" value="{{room.pk}}" />
-          <input class="form-control" name="role" id="suiteroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
-        </td>
-        <td>
-          <input class="form-control" name="square_meters" id="suiteroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
-        </td>
-        <td>
-          <input class="form-control" name="floor" id="suiteroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
-        </td>
-        <td>
-          <input class="btn btn-danger" type="button" data-pk="{{room.pk}}" value="X">
-        </td>
-      </tr>
-    {% endfor %}
-    {% else %}
-      <tr>
-        <td colspan="5">No rooms listed</td>
-      </tr>
-    {% endif %}
-    </tbody>
-  </table>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Room role</th>
+          <th>Size (m²)</th>
+          <th>Floor</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% if suite.suiteroom_set.count %}
+      {% for room in suite.suiteroom_set.all %}
+        <tr>
+          <td>
+            <input class="form-control" name="{{room.pk}}_role" id="suiteroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
+          </td>
+          <td>
+            <input class="form-control" name="{{room.pk}}_square_meters" id="suiteroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
+          </td>
+          <td>
+            <input class="form-control" name="{{room.pk}}_floor" id="suiteroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
+          </td>
+          <td>
+            <input class="btn btn-danger" type="button" data-model="suiteroom" data-pk="{{room.pk}}" value="X">
+          </td>
+        </tr>
+      {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="4">No rooms listed</td>
+        </tr>
+      {% endif %}
+      </tbody>
+    </table>
+    <input type="hidden" name="type" value="suiteroom" />
+    <input type="hidden" name="pk" value="{{suite.pk}}" />
+    <input class="saveform btn btn-primary" type="button" value="Save Changes" />
+    <input class="additem btn btn-success" type="button" data-model="suiteroom" data-parent="{{suite.pk}}" value="Add Room"/>
   </form>
-  <input class="saveform btn btn-primary" type="button" value="Save Changes" />
-  <input class="additem btn btn-success" type="button" data-model="suiteroom" data-parent="{{suite.pk}}" value="Add Room"/><br />
 {% endfor %}
 {% else %}
 <p>No suite listed</p>

@@ -12,6 +12,7 @@
 <body>
 {% include './nav.html' %}
 {% load humanize %}
+<div class="container">
 <h1>Property at {{property.street_address}}</h1>
 <p>{{property.description}}</p>
 <h2>Detail</h2>
@@ -66,7 +67,7 @@
         <li>Garage: {{ house.get_garage_display }}</li>
         <li>Parking: {{house.parking}}</li>
         <li>Extras: {{house.extras}}</li>
-        {% if house.houseroom.count %}
+        {% if house.houseroom_set.count %}
         <li>Rooms:
           <ul>
           {% for room in house.houseroom_set.all %}
@@ -110,7 +111,7 @@
             <li>Building Floors: {{suite.building_floors}}</li>
           </ul>
         </li>
-        {% if house.houseroom.count %}
+        {% if suite.suiteroom_set.count %}
         <li>Rooms:
           <ul>
           {% for room in suite.suiteroom_set.all %}
@@ -140,5 +141,6 @@
   <li>Mailing Address: {{property.owner.mail}}</li>
 {% endif %}
 </ul>
+</div>
 </body>
 </html>

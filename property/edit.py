@@ -88,10 +88,10 @@ class EditView:
             new_component = Structure.construct_default(parent)
         elif model == 'houseroom':
             new_component = HouseRoom.construct_default(parent)
-        elif model == 'suiterooom':
+        elif model == 'suiteroom':
             new_component = SuiteRoom.construct_default(parent)
         else:
-            errors.append('Cannot add a {} to your listing.'.format(model))
+            errors.append('Cannot create a {} for your listing.'.format(model))
             return
 
         try:
@@ -149,10 +149,6 @@ class EditView:
                 comp = House.objects.get(pk=pk)
             elif model == 'suite':
                 comp = Suite.objects.get(pk=pk)
-            elif model == "suiteroom":
-                comp = SuiteRoom.objects.get(pk=pk)
-            elif model == "houseroom":
-                comp = HouseRoom.objects.get(pk=pk)
             elif model == "structure":
                 comp = Structure.objects.get(pk=pk)
             else:
@@ -175,12 +171,69 @@ class EditView:
             errors.append("{}".format(e))
             return
 
-        print("Updating {} with id {}".format(model, pk))
-        print("Update: {}".format(updates))
         successes['type'] = model
         successes['pk'] = pk
         # successes['updated_model'] = serializers.serialize('json', obj)
         successes['updated_model'] = comp.export()
+
+    def update_rooms(self, model, errors, successes, pk, **updates):
+        try:
+            if model == 'houseroom':
+                comp = House.objects.get(pk=pk)
+            elif model == 'suiteroom':
+                comp = Suite.objects.get(pk=pk)
+            else:
+                errors.append('Cannot update the {} in your listing.'.format(model))
+                return
+        except (Suite.DoesNotExist, Lot.DoesNotExist, House.DoesNotExist):
+            errors.append("Cannot find listing to edit. Try refreshing the page.")
+            return
+
+        if not self.item_is_owned(comp):
+            errors.append("Not authorized to edit this listing")
+            return
+
+        # updates at this point looks like:
+        #{'11_floor': '1',
+        # '11_role': 'unspecified',
+        # '11_square_meters': '2',
+        # '12_floor': '1',
+        # '12_role': 'unspecified',
+        # '12_square_meters': '4',
+        # 'type': 'houseroom'}
+        print("updates: {}".format(updates))
+        keys = [k.partition("_")[0] for k in updates.keys()]
+        print("keys A: {}".format(keys))
+        keys = {k for k in keys if k.isnumeric()}
+        print("keys B: {}".format(keys))
+        room_updates = {}
+        for key in keys:
+            if model == 'houseroom':
+                room = HouseRoom.objects.get(pk=key)
+                if room.house != comp:
+                    errors.append("Not authorized to edit room {}".format(key))
+                    continue
+            elif model == 'suiteroom':
+                room = SuiteRoom.objects.get(pk=key)
+                if room.suite != comp:
+                    errors.append("Not authorized to edit room {}".format(key))
+                    continue
+            fixed_params = {
+                'floor': updates.get("{}_floor".format(key), room.floor),
+                'square_meters': updates.get("{}_square_meters".format(key), room.square_meters),
+                'role': updates.get("{}_role".format(key), room.role)
+            }
+            print("\nfor loop updates: {}".format(updates))
+            print("\nfixed params: {}".format(fixed_params))
+            room.update(fixed_params)
+            room.normalize_fields()
+            room.full_clean()
+            room.save()
+            room_updates[key] = room.export()
+
+        successes['type'] = model
+        successes['pk'] = pk
+        successes['updated_rooms'] = room_updates
 
     def post_method(self):
         if self.property.owner != self.user:
@@ -210,9 +263,10 @@ class EditView:
                 self.remove_component(model=decoded['model'], key=decoded['pk'], errors=errors, successes=successes)
             else:
                 errors.append('Error. Did not understand action {}'.format(action_type))
-        elif request_type in ['property', 'lot', 'structure', 'house', 'houseroom', 'suite', 'suiteroom']:
-            # TODO: SECURITY: verify permissions to perform update
+        elif request_type in ['property', 'lot', 'structure', 'house', 'suite']:
             self.update_component(model=request_type, errors=errors, successes=successes, **decoded)
+        elif request_type in ['houseroom', 'suiteroom']:
+            self.update_rooms(model=request_type, errors=errors, successes=successes, **decoded)
         else:
             errors.append('Error. Did not understand request type {}'.format(decoded['type']))
 

@@ -58,8 +58,14 @@ function objectifyForm(formElement) {
         console.log("response:", data.result);
         if (data.result === "success") {
             console.log(data.successes);
+            if (data.errors) {
+                console.warn(data.errors);
+            }
         } else {
             console.warn(data.errors);
+            if (data.successes) {
+                console.log(data.successes);
+            }
         }
     };
 

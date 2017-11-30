@@ -708,6 +708,7 @@ class HouseRoom(models.Model):
         self.role = self.role.strip()[:100]
 
     def update(self, params):
+        print("update params: {}".format(params))
         if 'square_meters' in params:
             self.square_meters = params['square_meters']
         if 'floor' in params:
