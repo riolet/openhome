@@ -11,8 +11,31 @@
 </head>
 <body>
 {% include './nav.html' %}
+{% load static %}
+{% load humanize %}
 <div class="container">
   <h1>Search & Results Page</h1>
+  {% if latest_property_list %}
+    <div class="row">
+      {% for property in latest_property_list %}
+      <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+        <a href="{% url 'property:detail' property.id %}">
+          <div class="card">
+            <img class="card-img-top" src="{% static 'property/img/noimage.jpg' %}"/>
+            <div class="card-body">
+              <h4 class="card-title">{{property.property_type|capfirst}}</h4>
+              <h6 class="card-subtitle mb-2 text-muted">${{ property.price|floatformat:"0"|intcomma }}</h6>
+              <h6 class="card-subtitle mb-2 text-muted">{{ property.city }}, {{ property.province }}</h6>
+              <p class="card-text">{{ property.description|truncatechars:100 }}</p>
+            </div>
+          </div>
+        </a>
+      </div>
+    {% endfor %}
+    </div>
+  {% else %}
+    <p>No properties are available in your region.</p>
+  {% endif %}
 </div>
 </body>
 </html>

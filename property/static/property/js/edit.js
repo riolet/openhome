@@ -28,17 +28,44 @@ function objectifyForm(formElement) {
   return returnObj;
 }
 
+function toast(msg) {
+    let x = document.getElementById("snackbar");
+    x.innerText = msg;
+    x.className = "show";
+    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+}
+
+function get_confirmation(title, question, cb_yes, cb_no) {
+    let dialog = $('#conf_modal')
+    $('#conf_title').text = title;
+    $('#conf_question').text = question;
+    $('#conf_yes').off("click");
+    if (typeof(cb_yes) === "function") {
+        $('#conf_yes').click(cb_yes);
+    }
+    $('#conf_no').off("click");
+    if (typeof(cb_no) === "function") {
+        $('#conf_no').click(cb_no);
+    }
+    dialog.modal();
+}
+
 (function () {
     "use strict";
     let prop = {
         property_id: "",
         edit_endpoint: "",
+        status: null,
+        status_btn: null
     };
 
     prop.init = function () {
         prop.property_id = document.getElementById("property_id").value;
         prop.edit_endpoint = document.getElementById("edit_property").action;
         prop.assign_button_clicks();
+        prop.status = document.getElementById("status");
+        prop.status_btn = document.getElementById("toggle_status");
+        prop.status_btn.addEventListener("click", prop.toggle_status);
     };
 
     prop.assign_button_clicks = function () {
@@ -48,9 +75,44 @@ function objectifyForm(formElement) {
 
         $(".additem").off("click");
         $(".additem").click(prop.add_item);
-        
+
         $(".delitem").off("click");
         $(".delitem").click(prop.remove_item);
+    };
+
+    prop.toggle_status = function () {
+        // send inverting action
+        let data;
+        if (prop.status_btn.value === "Publish") {
+            data = {
+                type: "action",
+                action: "status",
+                status: "A",
+            }
+        } else {
+            data = {
+                type: "action",
+                action: "status",
+                status: "U",
+            }
+        }
+        // get response
+        prop.send_post(data, function (response) {
+            let parsed = JSON.parse(response);
+            if (parsed.result === "success") {
+                toast("Status updated");
+                if (parsed.successes.status === "A") {
+                    prop.status.innerText = "Listed";
+                    prop.status_btn.value = "Unpublish";
+                } else {
+                    prop.status.innerText = "Unpublished";
+                    prop.status_btn.value = "Publish";
+                }
+            } else {
+                console.warn(parsed.errors);
+                toast("Error saving! Did you fill in all the fields properly?");
+            }
+        });
     };
 
     prop.test_action = function (data) {
@@ -60,7 +122,7 @@ function objectifyForm(formElement) {
     prop.send_post = function (data, cb_success) {
         let cb = cb_success || prop.post_success;
         send_post(prop.edit_endpoint, data, cb, prop.post_fail);
-    }
+    };
 
     prop.post_success = function (response) {
         let data = JSON.parse(response);
@@ -87,9 +149,17 @@ function objectifyForm(formElement) {
         let form = action.target.form;
         let data = objectifyForm(form);
         //prop.test_action(data);
-        prop.send_post(data);
-        // TODO: on success, use the returned data to replace the data in the form
-        // (in case the ingestion changes anything)
+        prop.send_post(data, function (response) {
+            let parsed = JSON.parse(response);
+            if (parsed.result === "success") {
+                // TODO: on success, use the returned data to replace the data in the form
+                // (in case the ingestion changed anything)
+                toast("Updates saved");
+            } else {
+                console.warn(parsed.errors);
+                toast("Error saving! Did you fill in all the fields properly?");
+            }
+        });
     };
 
     prop.add_item = function (action) {
@@ -107,7 +177,6 @@ function objectifyForm(formElement) {
                 prop.add_html(data.pk, parsed.successes.model, parsed.successes.pk)
             }
         });
-        // TODO: on success, Add new blank elements into the form, using the new key
     };
 
     prop.add_html = function(parent_key, model, child_key) {
@@ -176,13 +245,24 @@ function objectifyForm(formElement) {
             model: btn.dataset.model,
             pk: btn.dataset.pk,
         };
-        //prop.test_action(data);
-        prop.send_post(data, function (response) {
-            let parsed = JSON.parse(response);
-            if (parsed.result === "success") {
-                prop.remove_html(data.model, data.pk);
-            }
-        });
+        // get confirmation before proceeding (unless it's just a room)
+        if (data.model !== "houseroom" && data.model !== "suiteroom") {
+            get_confirmation("Please Confirm", "Are you sure you want to delete this " + data.model + "?", function () {
+                prop.send_post(data, function (response) {
+                    let parsed = JSON.parse(response);
+                    if (parsed.result === "success") {
+                        prop.remove_html(data.model, data.pk);
+                    }
+                });
+            });
+        } else {
+            prop.send_post(data, function (response) {
+                let parsed = JSON.parse(response);
+                if (parsed.result === "success") {
+                    prop.remove_html(data.model, data.pk);
+                }
+            });
+        }
     };
 
     prop.remove_html = function (model, key) {

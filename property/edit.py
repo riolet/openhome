@@ -144,7 +144,7 @@ class EditView:
     def update_component(self, model, errors, successes, pk, **updates):
         try:
             if model == 'property':
-                comp = Property.objects.get(pk=pk)
+                comp = self.property
             elif model == 'lot':
                 comp = Lot.objects.get(pk=pk)
             elif model == 'house':
@@ -237,6 +237,16 @@ class EditView:
         successes['pk'] = pk
         successes['updated_rooms'] = room_updates
 
+    def update_status(self, new_status, errors, successes):
+        try:
+            self.property.status = new_status.strip()[:1]
+            self.property.full_clean()
+            self.property.save()
+        except Exception as e:
+            errors.append("{}".format(e))
+            return
+        successes['status'] = self.property.status
+
     def post_method(self):
         if self.property.owner != self.user:
             return HttpResponseForbidden()
@@ -245,7 +255,8 @@ class EditView:
         decoded = json.loads(str_request)
         # request will be a JSON dictionary.
         #   if .type is "action"
-        #     .action will be "add" or "remove"
+        #     .action will be "add" or "remove" or "status"
+        #     .status will be 'U' or 'A'
         #     .model will be the model type to add/remove
         #     .pk will be the key to delete or parent id
         #   elif .type is a model
@@ -266,6 +277,8 @@ class EditView:
                 self.remove_component(model=decoded['model'], key=decoded['pk'], errors=errors, successes=successes)
                 # if deleting the whole listing, don't update the timestamp on it.
                 do_stamp_update = (decoded['model'] != 'property')
+            elif action_type == 'status':
+                self.update_status(decoded['status'], errors=errors, successes=successes)
             else:
                 errors.append('Error. Did not understand action {}'.format(action_type))
         elif request_type in ['property', 'lot', 'structure', 'house', 'suite']:
@@ -276,7 +289,7 @@ class EditView:
             errors.append('Error. Did not understand request type {}'.format(decoded['type']))
 
         # update the edit date stamp
-        if do_stamp_update:
+        if do_stamp_update and not errors:
             self.property.edit_stamp = timezone.now()
             self.property.save()
 

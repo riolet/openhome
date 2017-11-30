@@ -34,7 +34,7 @@ class Property(models.Model):
     STATUS = (
         ('U', 'Unpublished'),
         ('S', 'Sold'),
-        ('A', 'Available'),
+        ('A', 'Listed'),
         ('R', 'Removed'),
         ('P', 'Pending Sale'),
     )

@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  {% load static %}
   <meta charset="UTF-8">
   <title>Editing Property: {{property.id}}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'property/css/toast.css' %}">
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
-  {% load static %}
   <script src="{% static 'property/js/edit.js' %}"></script>
 </head>
 <body>
@@ -38,10 +39,18 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
 <div class="card">
   <div class="card-header">
-    <h2 class="float-left">Property at {{property.street_address}} ({{property.get_status_display}})</h2>
-    <input class="delitem btn btn-danger float-right" type="button" data-model="property" data-pk="{{property.pk}}" value="Delete Entire Listing">
+    <h2 class="float-left">Property at {{property.street_address}} (<span id="status">{{property.get_status_display}}</span>)</h2>
+  </div>
+  <div class="card-footer">
+    {% if property.status == "U" %}
+    <input class="btn btn-primary" id="toggle_status" type="button" value="Publish" />
+    {% elif property.status == "A" %}
+    <input class="btn btn-primary" id="toggle_status" type="button" value="Unpublish" />
+    {% endif %}
+    <input class="delitem btn btn-danger" type="button" data-model="property" data-pk="{{property.pk}}" value="Delete Entire Listing">
   </div>
 </div>
+<hr />
 <form id="edit_property" action="{% url 'property:edit' property.id %}" method="post">
   <input type="hidden" name="type" value="property" />
   <input type="hidden" name="pk" id="property_id" value="{{property.pk}}" />
@@ -722,6 +731,29 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 </div>
 
 </div><!-- container -->
+
+<div id="conf_modal" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="conf_title">Are you sure?</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p id="conf_question">Are you sure?</p>
+      </div>
+      <div class="modal-footer">
+        <button id="conf_yes" type="button" class="btn btn-primary" data-dismiss="modal">Confirm</button>
+        <button id="conf_no" type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="snackbar">Updated</div>
+
 
 <script>
 (function () {

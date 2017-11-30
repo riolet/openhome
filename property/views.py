@@ -24,7 +24,9 @@ class DetailView(generic.DetailView):
 
 
 def search_results(request):
-    return render(request, 'property/results.html')
+    return render(request, 'property/results.html', {
+        'latest_property_list': Property.objects.order_by('-publish_stamp').filter(Q(status='A') | Q(status='P'))
+    })
 
 
 def search(request):
