@@ -109,7 +109,9 @@ class EditView:
 
     def remove_component(self, model, key, errors, successes):
         try:
-            if model == 'lot':
+            if model == 'property':
+                deathrow = Property.objects.get(pk=key)
+            elif model == 'lot':
                 deathrow = Lot.objects.get(pk=key)
             elif model == 'house':
                 deathrow = House.objects.get(pk=key)
@@ -254,6 +256,7 @@ class EditView:
         #   - primary key of any new object
         errors = []
         successes = {}
+        do_stamp_update = True
         request_type = decoded.get('type', 'error')
         if request_type == 'action':
             action_type = decoded.get('action', 'error')
@@ -261,6 +264,8 @@ class EditView:
                 self.add_component(model=decoded['model'], parent_id=decoded['pk'], errors=errors, successes=successes)
             elif action_type == 'remove':
                 self.remove_component(model=decoded['model'], key=decoded['pk'], errors=errors, successes=successes)
+                # if deleting the whole listing, don't update the timestamp on it.
+                do_stamp_update = (decoded['model'] != 'property')
             else:
                 errors.append('Error. Did not understand action {}'.format(action_type))
         elif request_type in ['property', 'lot', 'structure', 'house', 'suite']:
@@ -269,6 +274,11 @@ class EditView:
             self.update_rooms(model=request_type, errors=errors, successes=successes, **decoded)
         else:
             errors.append('Error. Did not understand request type {}'.format(decoded['type']))
+
+        # update the edit date stamp
+        if do_stamp_update:
+            self.property.edit_stamp = timezone.now()
+            self.property.save()
 
         # data = {}
         # data['something'] = 'useful'

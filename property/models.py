@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+from decimal import Decimal
 import re
 
 
@@ -62,6 +63,7 @@ class Property(models.Model):
 
     owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     creation_stamp = models.DateTimeField('creation time')
+    # publish_stamp is not implemented yet and will be null.
     publish_stamp = models.DateTimeField('publish time', null=True, blank=True, default=None)
     edit_stamp = models.DateTimeField('latest edit time')
     status = models.CharField(max_length=1, choices=STATUS)
@@ -114,8 +116,8 @@ class Property(models.Model):
         self.neighborhood = self.neighborhood.strip()
         self.street_address = self.street_address.strip()
         self.postal_code = self.postal_code.replace(' ', '').strip()
-        self.latitude = ((float(self.latitude) + 180) % 360) - 180
-        self.longitude = ((float(self.longitude) + 180) % 360) - 180
+        self.latitude = ((round(Decimal(self.latitude), 6) + 180) % 360) - 180
+        self.longitude = ((round(Decimal(self.longitude), 6) + 180) % 360) - 180
 
     def update(self, params):
         if 'status' in params:

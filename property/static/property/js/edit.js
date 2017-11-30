@@ -42,18 +42,19 @@ function objectifyForm(formElement) {
         //Hook up handlers to buttons everywhere!
         $(".saveform").click(prop.save_form);
         $(".additem").click(prop.add_item);
+        $(".delitem").click(prop.remove_item);
     };
 
     prop.test_action = function (data) {
         console.log("Msg to", prop.property_id, ":", data);
     };
 
-    prop.send_post = function (data) {
-        send_post(prop.edit_endpoint, data, prop.post_success, prop.post_fail);
+    prop.send_post = function (data, cb_success) {
+        let cb = cb_success || prop.post_success;
+        send_post(prop.edit_endpoint, data, cb, prop.post_fail);
     }
 
-    prop.post_success = function (response, cb_success) {
-        let cb = cb_success || prop.post_success;
+    prop.post_success = function (response) {
         let data = JSON.parse(response);
         console.log("response:", data.result);
         if (data.result === "success") {
@@ -99,7 +100,7 @@ function objectifyForm(formElement) {
             type: "action",
             action: "remove",
             model: btn.dataset.model,
-            pk: btn.dataset.parent,
+            pk: btn.dataset.pk,
         };
         //prop.test_action(data);
         prop.send_post(data);

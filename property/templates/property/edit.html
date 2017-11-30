@@ -34,7 +34,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
 <!-- Property Information -->
 
-<h1>Property at {{property.street_address}}</h1>
+<h1>Property at {{property.street_address}}</h1><input class="delitem btn btn-danger" type="button" data-model="property" data-pk="{{property.pk}}" value="Delete Entire Listing">
 <form id="edit_property" action="{% url 'property:edit' property.id %}" method="post">
   <input type="hidden" name="type" value="property" />
   <input type="hidden" name="pk" id="property_id" value="{{property.pk}}" />
@@ -190,23 +190,34 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
       <input type="hidden" name="type" value="lot" />
       <input type="hidden" name="pk" value="{{lot.pk}}" />
       <h3>Lot {{forloop.counter}}</h3>
+      <input class="delitem btn btn-danger" type="button" data-model="lot" data-pk="{{lot.pk}}" value="X">
+
       <div class="row">
         <div class="col-sm">
           <div class="form-group">
             <label for="lot_{{lot.pk}}__square_meters">Square meters</label>
-            <input class="form-control" name="square_meters" id="lot_{{lot.pk}}__square_meters" type="number" placeholder="200,000" min="0" step="0.1" value="{{lot.square_meters}}" required />
+            <div class="input-group">
+              <input class="form-control" name="square_meters" id="lot_{{lot.pk}}__square_meters" type="number" placeholder="200,000" min="0" step="0.1" value="{{lot.square_meters}}" required />
+              <span class="input-group-addon">m²</span>
+            </div>
           </div>
         </div>
         <div class="col-sm">
           <div class="form-group">
             <label for="lot_{{lot.pk}}__width">Width (street-facing side)</label>
-            <input class="form-control" name="width" id="lot_{{lot.pk}}__width" type="number" placeholder="100.0" min="0" step="0.1" value="{{lot.width}}" required />
+            <div class="input-group">
+              <input class="form-control" name="width" id="lot_{{lot.pk}}__width" type="number" placeholder="100.0" min="0" step="0.1" value="{{lot.width}}" required />
+              <span class="input-group-addon">m</span>
+            </div>
           </div>
         </div>
         <div class="col-sm">
           <div class="form-group">
             <label for="lot_{{lot.pk}}__depth">Depth</label>
-            <input class="form-control" name="depth" id="lot_{{lot.pk}}__depth" type="number" placeholder="200.0" min="0" step="0.1" value="{{lot.depth}}" required />
+            <div class="input-group">
+              <input class="form-control" name="depth" id="lot_{{lot.pk}}__depth" type="number" placeholder="200.0" min="0" step="0.1" value="{{lot.depth}}" required />
+              <span class="input-group-addon">m</span>
+            </div>
           </div>
         </div>
       </div>
@@ -230,35 +241,45 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
         <input type="hidden" name="type" value="structure" />
         <input type="hidden" name="pk" value="{{structure.pk}}" />
         <h4>Structure {{forloop.counter}}</h4>
+        <input class="delitem btn btn-danger" type="button" data-model="structure" data-pk="{{structure.pk}}" value="X">
         <div class="row">
           <div class="col-md-3 col-sm-6 col-12">
             <div class="form-group">
-              <label for="structure_{{structure.pk}}__square_meters">Square meters:</label>
+              <label for="structure_{{structure.pk}}__square_meters">Square meters</label>
               <input class="form-control" name="square_meters" id="structure_{{structure.pk}}__square_meters" type="number" placeholder="6" min="0" step="0.1" value="{{structure.square_meters}}" required />
             </div>
           </div>
           <div class="col-md-3 col-sm-6 col-12">
             <div class="form-group">
-              <label for="structure_{{structure.pk}}__width">Width:</label>
-              <input class="form-control" name="width" id="structure_{{structure.pk}}__width" type="number" placeholder="3.0" min="0" step="0.1" value="{{structure.width}}" required />
+              <label for="structure_{{structure.pk}}__width">Width</label>
+              <div class="input-group">
+                <input class="form-control" name="width" id="structure_{{structure.pk}}__width" type="number" placeholder="3.0" min="0" step="0.1" value="{{structure.width}}" required />
+                <span class="input-group-addon">m</span>
+              </div>
             </div>
           </div>
           <div class="col-md-3 col-sm-6 col-12">
             <div class="form-group">
-              <label for="structure_{{structure.pk}}__depth">Depth:</label>
-              <input class="form-control" name="depth" id="structure_{{structure.pk}}__depth" type="number" placeholder="2.0" min="0" step="0.1" value="{{structure.depth}}" required />
+              <label for="structure_{{structure.pk}}__depth">Depth</label>
+              <div class="input-group">
+                <input class="form-control" name="depth" id="structure_{{structure.pk}}__depth" type="number" placeholder="2.0" min="0" step="0.1" value="{{structure.depth}}" required />
+                <span class="input-group-addon">m</span>
+              </div>
             </div>
           </div>
           <div class="col-md-3 col-sm-6 col-12">
             <div class="form-group">
-              <label for="structure_{{structure.pk}}__height">Height:</label>
-              <input class="form-control" name="height" id="structure_{{structure.pk}}__height" type="number" placeholder="2.5" min="0" step="0.1" value="{{structure.height}}" required />
+              <label for="structure_{{structure.pk}}__height">Height</label>
+              <div class="input-group">
+                <input class="form-control" name="height" id="structure_{{structure.pk}}__height" type="number" placeholder="2.5" min="0" step="0.1" value="{{structure.height}}" required />
+                <span class="input-group-addon">m</span>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="form-group">
-          <label for="structure_{{structure.pk}}__description">Description of structure:</label>
+          <label for="structure_{{structure.pk}}__description">Description of structure</label>
           <textarea class="form-control" name="description" id="structure_{{structure.pk}}__description" rows=3 cols=70 form="edit_structure_{{structure.pk}}" required>{{structure.description}}</textarea>
         </div>
 
@@ -288,6 +309,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
     <input type="hidden" name="pk" value="{{house.pk}}" />
     <div class="house">
       <h3>House {{forloop.counter}}</h3>
+      <input class="delitem btn btn-danger" type="button" data-model="house" data-pk="{{house.pk}}" value="X">
       <div class="row">
         <div class="col-md-3 col-sm-6 col-12">
           <div class="form-group">
@@ -317,7 +339,10 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
         <div class="col-md-3 col-sm-6 col-12">
           <div class="form-group">
             <label for="house_{{house.pk}}__square_meters">Square meters</label>
-            <input class="form-control" name="square_meters" id="house_{{house.pk}}__square_meters" type="number" placeholder="200" min="0" step="0.1" value="{{house.square_meters}}" required />
+            <div class="input-group">
+              <input class="form-control" name="square_meters" id="house_{{house.pk}}__square_meters" type="number" placeholder="200" min="0" step="0.1" value="{{house.square_meters}}" required />
+              <span class="input-group-addon">m²</span>
+            </div>
           </div>
         </div>
         <div class="col-md-3 col-sm-6 col-12">
@@ -382,13 +407,16 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
           <input class="form-control" name="{{room.pk}}_role" id="houseroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
         </td>
         <td>
-          <input class="form-control" name="{{room.pk}}_square_meters" id="houseroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
+          <div class="input-group">
+            <input class="form-control" name="{{room.pk}}_square_meters" id="houseroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
+            <span class="input-group-addon">m²</span>
+          </div>
         </td>
         <td>
           <input class="form-control" name="{{room.pk}}_floor" id="houseroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
         </td>
         <td>
-          <input class="btn btn-danger" type="button" data-model="houseroom" data-pk="{{room.pk}}" value="X">
+          <input class="delitem btn btn-danger" type="button" data-model="houseroom" data-pk="{{room.pk}}" value="X">
         </td>
       </tr>
     {% endfor %}
@@ -422,6 +450,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
     <input type="hidden" name="pk" value="{{suite.pk}}" />
     <div class="suite">
       <h3>Suite {{forloop.counter}}</h3>
+      <input class="delitem btn btn-danger" type="button" data-model="suite" data-pk="{{suite.pk}}" value="X">
       <div class="row">
         <div class="col-md-3 col-sm-6 col-12">
           <div class="form-group">
@@ -451,7 +480,10 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
         <div class="col-md-3 col-sm-6 col-12">
           <div class="form-group">
             <label for="suite_{{suite.pk}}__square_meters">Square meters</label>
-            <input class="form-control" name="square_meters" id="suite_{{suite.pk}}__square_meters" type="number" placeholder="200" min="0" step="0.1" value="{{suite.square_meters}}" required />
+            <div class="input-group">
+              <input class="form-control" name="square_meters" id="suite_{{suite.pk}}__square_meters" type="number" placeholder="200" min="0" step="0.1" value="{{suite.square_meters}}" required />
+              <span class="input-group-addon">m²</span>
+            </div>
           </div>
         </div>
         <div class="col-md-3 col-sm-6 col-12">
@@ -594,13 +626,16 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
             <input class="form-control" name="{{room.pk}}_role" id="suiteroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
           </td>
           <td>
-            <input class="form-control" name="{{room.pk}}_square_meters" id="suiteroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
+            <div class="input-group">
+              <input class="form-control" name="{{room.pk}}_square_meters" id="suiteroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
+              <span class="input-group-addon">m²</span>
+            </div>
           </td>
           <td>
             <input class="form-control" name="{{room.pk}}_floor" id="suiteroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
           </td>
           <td>
-            <input class="btn btn-danger" type="button" data-model="suiteroom" data-pk="{{room.pk}}" value="X">
+            <input class="delitem btn btn-danger" type="button" data-model="suiteroom" data-pk="{{room.pk}}" value="X">
           </td>
         </tr>
       {% endfor %}
