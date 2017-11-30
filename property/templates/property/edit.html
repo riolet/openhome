@@ -34,7 +34,8 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 
 <!-- Property Information -->
 
-<h1>Property at {{property.street_address}}</h1><input class="delitem btn btn-danger" type="button" data-model="property" data-pk="{{property.pk}}" value="Delete Entire Listing">
+<h1>Property at {{property.street_address}}</h1>
+<input class="delitem btn btn-danger" type="button" data-model="property" data-pk="{{property.pk}}" value="Delete Entire Listing">
 <form id="edit_property" action="{% url 'property:edit' property.id %}" method="post">
   <input type="hidden" name="type" value="property" />
   <input type="hidden" name="pk" id="property_id" value="{{property.pk}}" />
@@ -246,7 +247,10 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
           <div class="col-md-3 col-sm-6 col-12">
             <div class="form-group">
               <label for="structure_{{structure.pk}}__square_meters">Square meters</label>
-              <input class="form-control" name="square_meters" id="structure_{{structure.pk}}__square_meters" type="number" placeholder="6" min="0" step="0.1" value="{{structure.square_meters}}" required />
+              <div class="input-group">
+                <input class="form-control" name="square_meters" id="structure_{{structure.pk}}__square_meters" type="number" placeholder="6" min="0" step="0.1" value="{{structure.square_meters}}" required />
+                <span class="input-group-addon">m²</span>
+              </div>
             </div>
           </div>
           <div class="col-md-3 col-sm-6 col-12">
