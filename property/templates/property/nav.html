@@ -10,7 +10,7 @@
         <a class="nav-link" href="{% url 'property:home' %}">Home <span class="sr-only">(current)</span></a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'property:search' %}">Search</a>
+        <a class="nav-link" href="{% url 'property:search results' %}">Search</a>
       </li>
       {% if request.session.logged_in %}
       <li class="nav-item">
