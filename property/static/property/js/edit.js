@@ -80,6 +80,8 @@ function objectifyForm(formElement) {
         let data = objectifyForm(form);
         //prop.test_action(data);
         prop.send_post(data);
+        // TODO: on success, use the returned data to replace the data in the form
+        // (in case the ingestion changes anything)
     };
 
     prop.add_item = function (action) {
@@ -92,6 +94,7 @@ function objectifyForm(formElement) {
         };
         //prop.test_action(data);
         prop.send_post(data);
+        // TODO: on success, Add new blank elements into the form, using the new key
     };
 
     prop.remove_item = function (action) {
@@ -103,7 +106,21 @@ function objectifyForm(formElement) {
             pk: btn.dataset.pk,
         };
         //prop.test_action(data);
-        prop.send_post(data);
+        prop.send_post(data, function (response) {
+            let data = JSON.parse(response);
+            if (data.result === "success") {
+                prop.remove_html(data.model, data.pk);
+            }
+        });
+    };
+
+    prop.remove_html = function (model, key) {
+        if (model === "property") {
+            window.location.replace("/")
+        } else {
+            let card = "#" + model + "_" + key + "_" + "card";
+            $(card).remove();
+        }
     };
 
     //install layout

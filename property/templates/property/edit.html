@@ -188,7 +188,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 <h2>Land</h2>
 {% if property.lot_set.count %}
 {% for lot in property.lot_set.all %}
-  <div class="card">
+  <div id="lot_{{lot.pk}}_card" class="card">
     <div class="card-header">
       <h3 class="float-left">Lot {{forloop.counter}}</h3>
       <input class="delitem btn btn-danger float-right" type="button" data-model="lot" data-pk="{{lot.pk}}" value="X">
@@ -245,7 +245,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
       <p class="text-muted">Other than houses</p>
       {% if lot.structure_set.count %}
       {% for structure in lot.structure_set.all %}
-        <div class="card">
+        <div id="structure_{{structure.pk}}_card" class="card">
           <div class="card-header">
             <h4 class="float-left">Structure {{forloop.counter}}</h4>
             <input class="delitem btn btn-danger float-right" type="button" data-model="structure" data-pk="{{structure.pk}}" value="X">
@@ -327,7 +327,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 <h2>Houses</h2>
 {% if property.house_set.count %}
 {% for house in property.house_set.all %}
-  <div class="card">
+  <div id="house_{{house.pk}}_card" class="card">
     <div class="card-header">
       <h3 class="float-left">House {{forloop.counter}}</h3>
       <input class="delitem btn btn-danger float-right" type="button" data-model="house" data-pk="{{house.pk}}" value="X">
@@ -415,6 +415,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
           <input class="saveform btn btn-primary" type="button" value="Save Changes" />
         </div>
       </form>
+
       <hr />
       <div class="card">
         <div class="card-header">
@@ -434,7 +435,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
             <tbody>
             {% if house.houseroom_set.count %}
             {% for room in house.houseroom_set.all %}
-              <tr>
+              <tr id="houseroom_{{room.pk}}_card">
                 <td>
                   <input class="form-control" name="{{room.pk}}_role" id="houseroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
                 </td>
@@ -481,7 +482,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
 <h2>Suite</h2>
 {% if property.suite_set.count %}
 {% for suite in property.suite_set.all %}
-  <div class="card">
+  <div id="suite_{{suite.pk}}_card" class="card">
     <div class="card-header">
       <h3 class="float-left">Suite {{forloop.counter}}</h3>
       <input class="delitem btn btn-danger float-right" type="button" data-model="suite" data-pk="{{suite.pk}}" value="X">
@@ -666,7 +667,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
               <tbody>
               {% if suite.suiteroom_set.count %}
               {% for room in suite.suiteroom_set.all %}
-                <tr>
+                <tr id="suiteroom_{{room.pk}}_card">
                   <td>
                     <input class="form-control" name="{{room.pk}}_role" id="suiteroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
                   </td>
