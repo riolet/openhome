@@ -43,8 +43,13 @@ function objectifyForm(formElement) {
 
     prop.assign_button_clicks = function () {
         //Hook up handlers to buttons everywhere!
+        $(".saveform").off("click");
         $(".saveform").click(prop.save_form);
+
+        $(".additem").off("click");
         $(".additem").click(prop.add_item);
+        
+        $(".delitem").off("click");
         $(".delitem").click(prop.remove_item);
     };
 
@@ -127,8 +132,40 @@ function objectifyForm(formElement) {
             child.id = "suiteroom_" + child_key + "_card";
             child.innerHTML = markup;
             host.appendChild(child);
+        } else if (model === "structure") {
+            host = document.getElementById('lot_' + parent_key + "_structures");
+            markup = templates.structure.replace(/000/g, child_key);
+            child = document.createElement("div");
+            child.id = "structure_" + child_key + "_card";
+            child.className = "card"
+            child.innerHTML = markup;
+            host.appendChild(child);
+        } else if (model === "lot") {
+            host = document.getElementById('property_' + parent_key + "_lots");
+            markup = templates.lot.replace(/000/g, child_key);
+            child = document.createElement("div");
+            child.id = "lot_" + child_key + "_card";
+            child.className = "card"
+            child.innerHTML = markup;
+            host.appendChild(child);
+        } else if (model === "house") {
+            host = document.getElementById('property_' + parent_key + "_houses");
+            markup = templates.house.replace(/000/g, child_key);
+            child = document.createElement("div");
+            child.id = "house_" + child_key + "_card";
+            child.className = "card"
+            child.innerHTML = markup;
+            host.appendChild(child);
+        } else if (model === "suite") {
+            host = document.getElementById('property_' + parent_key + "_suites");
+            markup = templates.suite.replace(/000/g, child_key);
+            child = document.createElement("div");
+            child.id = "suite_" + child_key + "_card";
+            child.className = "card"
+            child.innerHTML = markup;
+            host.appendChild(child);
         }
-        props.assign_button_clicks();
+        prop.assign_button_clicks();
     };
 
     prop.remove_item = function (action) {
