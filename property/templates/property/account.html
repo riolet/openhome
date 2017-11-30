@@ -11,6 +11,7 @@
 </head>
 <body>
 {% include './nav.html' %}
+{% load humanize %}
 <div class="container">
   <h1>User: {{user.login_email}}</h1>
   <h2>Contact Info:</h2>
@@ -105,7 +106,7 @@
   {% if user.property_set.count %}
     <ul>
     {% for property in user.property_set.all %}
-      <li><a href="{% url 'property:detail' property.id %}">${{ property.price|floatformat:"0" }} - {{ property.property_type|capfirst }} in {{ property.city }}, {{ property.province }}</a> - {{ property.description|truncatechars:40 }} <a href="{% url 'property:edit' property.id %}">Edit</a></li>
+      <li><a href="{% url 'property:detail' property.id %}">${{ property.price|floatformat:"0"|intcomma }} - {{ property.property_type|capfirst }} in {{ property.city }}, {{ property.province }}</a> - {{ property.description|truncatechars:40 }} <a href="{% url 'property:edit' property.id %}">Edit</a></li>
     {% endfor %}
     </ul>
   {% else %}

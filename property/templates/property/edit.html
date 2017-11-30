@@ -158,11 +158,11 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
       <label for="latitude">Latitude & Longitude (optional, for more accurate pin)</label>
       <div class="row">
         <div class="col-sm">
-          <input class="form-control" name="latitude" id="latitude" type="number" placeholder="49.082682" value="{{property.latitude}}" />
+          <input class="form-control" name="latitude" id="latitude" type="number" placeholder="49.082682" step="0.000001" value="{{property.latitude}}" />
           <small class="form-text text-muted">Latitude</small>
         </div>
         <div class="col-sm">
-          <input class="form-control" name="longitude" id="longitude" type="number" placeholder="-122.210422" value="{{property.longitude}}" />
+          <input class="form-control" name="longitude" id="longitude" type="number" placeholder="-122.210422" step="0.000001" value="{{property.longitude}}" />
           <small class="form-text text-muted">Longitude</small>
         </div>
       </div>
@@ -189,7 +189,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
     <div class="lot">
       <input class="form-control" type="hidden" name="type" value="lot" />
       <input class="form-control" type="hidden" name="pk" value="{{lot.pk}}" />
-      <h3>Lot {{lot.pk}}</h3>
+      <h3>Lot {{forloop.counter}}</h3>
       <div class="row">
         <div class="col-sm">
           <div class="form-group">
@@ -229,7 +229,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
       <div class="structure">
         <input class="form-control" type="hidden" name="type" value="structure" />
         <input class="form-control" type="hidden" name="pk" value="{{structure.pk}}" />
-        <h4>Structure {{structure.pk}}</h4>
+        <h4>Structure {{forloop.counter}}</h4>
         <div class="row">
           <div class="col-md-3 col-sm-6 col-12">
             <div class="form-group">
@@ -287,7 +287,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
     <input class="form-control" type="hidden" name="type" value="house" />
     <input class="form-control" type="hidden" name="pk" value="{{house.pk}}" />
     <div class="house">
-      <h3>Lot {{house.pk}}</h3>
+      <h3>House {{forloop.counter}}</h3>
       <div class="row">
         <div class="col-md-3 col-sm-6 col-12">
           <div class="form-group">
@@ -368,20 +368,16 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
   <table class="table">
     <thead>
       <tr>
-        <th>#</th>
         <th>Room role</th>
         <th>Size (m²)</th>
         <th>Floor</th>
-        <th>&nbsp;</th>
+        <th>Remove</th>
       </tr>
     </thead>
     <tbody>
     {% if house.houseroom_set.count %}
     {% for room in house.houseroom_set.all %}
       <tr>
-        <td>
-          {{room.pk}}
-        </td>
         <td>
           <input class="form-control" name="{{room.pk}}_role" id="houseroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
         </td>
@@ -392,13 +388,13 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
           <input class="form-control" name="{{room.pk}}_floor" id="houseroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
         </td>
         <td>
-          <input class="btn btn-danger" type="button" value="X">
+          <input class="btn btn-danger" type="button" data-pk="{{room.pk}}" value="X">
         </td>
       </tr>
     {% endfor %}
     {% else %}
       <tr>
-        <td colspan="5">No rooms listed</td>
+        <td colspan="4">No rooms listed</td>
       </tr>
     {% endif %}
     </tbody>
@@ -424,7 +420,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
     <input class="form-control" type="hidden" name="type" value="suite" />
     <input class="form-control" type="hidden" name="pk" value="{{suite.pk}}" />
     <div class="suite">
-      <h3>Lot {{suite.pk}}</h3>
+      <h3>Suite {{forloop.counter}}</h3>
       <div class="row">
         <div class="col-md-3 col-sm-6 col-12">
           <div class="form-group">
@@ -583,11 +579,10 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
   <table class="table">
     <thead>
       <tr>
-        <th>#</th>
         <th>Room role</th>
         <th>Size (m²)</th>
         <th>Floor</th>
-        <th>&nbsp;</th>
+        <th>Remove</th>
       </tr>
     </thead>
     <tbody>
@@ -595,11 +590,8 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
     {% for room in suite.suiteroom_set.all %}
       <tr>
         <td>
-          {{room.pk}}
           <input class="form-control" type="hidden" name="type" value="suiteroom" />
           <input class="form-control" type="hidden" name="pk" value="{{room.pk}}" />
-        </td>
-        <td>
           <input class="form-control" name="role" id="suiteroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
         </td>
         <td>
@@ -609,7 +601,7 @@ const csrftoken = $("[name=csrfmiddlewaretoken]").val();
           <input class="form-control" name="floor" id="suiteroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
         </td>
         <td>
-          <input class="btn btn-danger" type="button" value="X">
+          <input class="btn btn-danger" type="button" data-pk="{{room.pk}}" value="X">
         </td>
       </tr>
     {% endfor %}

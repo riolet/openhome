@@ -146,11 +146,11 @@
         <label for="latitude">Latitude & Longitude (optional, for more accurate pin)</label>
         <div class="row">
           <div class="col-sm">
-            <input class="form-control" name="latitude" id="latitude" type="number" placeholder="49.082682" value="{{property.latitude}}" />
+            <input class="form-control" name="latitude" id="latitude" type="number" placeholder="49.082682" step="0.000001" value="{{property.latitude}}" />
             <small class="form-text text-muted">Latitude</small>
           </div>
           <div class="col-sm">
-            <input class="form-control" name="longitude" id="longitude" type="number" placeholder="-122.210422" value="{{property.longitude}}" />
+            <input class="form-control" name="longitude" id="longitude" type="number" placeholder="-122.210422" step="0.000001" value="{{property.longitude}}" />
             <small class="form-text text-muted">Longitude</small>
           </div>
         </div>
