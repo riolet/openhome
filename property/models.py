@@ -102,13 +102,13 @@ class Property(models.Model):
             latitude
             longitude
         """
-        self.status = self.status.upper().strip()
+        self.status = self.status.upper().strip()[:1]
         self.description = self.description.strip()
         self.price = float(self.price)
         self.property_tax = float(self.property_tax)
         self.property_type = self.property_type.strip()
-        self.country = self.country.upper().strip()
-        self.province = self.province.upper().strip()
+        self.country = self.country.upper().strip()[:3]
+        self.province = self.province.upper().strip()[:2]
         self.region = self.region.strip()
         self.city = self.city.strip()
         self.neighborhood = self.neighborhood.strip()
@@ -116,6 +116,55 @@ class Property(models.Model):
         self.postal_code = self.postal_code.replace(' ', '').strip()
         self.latitude = ((float(self.latitude) + 180) % 360) - 180
         self.longitude = ((float(self.longitude) + 180) % 360) - 180
+
+    def update(self, params):
+        if 'status' in params:
+            self.status = params['status']
+        if 'description' in params:
+            self.description = params['description']
+        if 'price' in params:
+            self.price = params['price']
+        if 'property_tax' in params:
+            self.property_tax = params['property_tax']
+        if 'property_type' in params:
+            self.property_type = params['property_type']
+        if 'country' in params:
+            self.country = params['country']
+        if 'province' in params:
+            self.province = params['province']
+        if 'region' in params:
+            self.region = params['region']
+        if 'city' in params:
+            self.city = params['city']
+        if 'neighborhood' in params:
+            self.neighborhood = params['neighborhood']
+        if 'street_address' in params:
+            self.street_address = params['street_address']
+        if 'postal_code' in params:
+            self.postal_code = params['postal_code']
+        if 'latitude' in params:
+            self.latitude = params['latitude']
+        if 'longitude' in params:
+            self.longitude = params['longitude']
+
+    def export(self):
+        data = {
+            'status': self.status,
+            'description': self.description,
+            'price': self.price,
+            'property_tax': self.property_tax,
+            'property_type': self.property_type,
+            'country': self.country,
+            'province': self.province,
+            'region': self.region,
+            'city': self.city,
+            'neighborhood': self.neighborhood,
+            'street_address': self.street_address,
+            'postal_code': self.postal_code,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+        }
+        return data
 
     def escape_fields(self):
         """

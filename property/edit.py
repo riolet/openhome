@@ -180,7 +180,7 @@ class EditView:
         successes['type'] = model
         successes['pk'] = pk
         # successes['updated_model'] = serializers.serialize('json', obj)
-        successes['updated_model'] = comp.export
+        successes['updated_model'] = comp.export()
 
     def post_method(self):
         if self.property.owner != self.user:
