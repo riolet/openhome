@@ -1,12 +1,12 @@
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
-from django.core.exceptions import ValidationError
+from django.http import HttpResponse, HttpResponseRedirect
 from django.db.models import Q
+from django.core.exceptions import ValidationError
 from django.shortcuts import render, get_object_or_404, reverse
 from django.views import generic
 from django.utils import timezone
-from .login import login, logout
-
-from .models import *
+from property.login import login, logout
+from property.edit import edit
+from property.models import Property, User
 
 
 class HomeView(generic.ListView):
@@ -96,34 +96,6 @@ def new(request):
             'country_choices': Property.COUNTRIES,
             'status_choices': Property.STATUS,
             'province_choices': Property.PROVINCES,
-        })
-
-
-def edit(request, property_id):
-    user_id = request.session.get('login_email', '')
-    user = get_object_or_404(User, pk=user_id.lower())
-    property = get_object_or_404(Property, pk=property_id)
-    if property.owner != user:
-        return HttpResponseForbidden()
-
-    if request.method == 'POST':
-        # request will be a JSON action dictionary.
-        # actions may be:
-        #   - update (object_id, key:values)
-        #   - add (parent, object_type)
-        #   - remove (object_id)
-        # response will be a JSON response including:
-        #   - success/failure of action
-        #   - primary key of any new object
-        return HttpResponse("Update property listing {} in database".format(property_id))
-    else:
-        return render(request, 'property/edit.html', {
-            'user': user,
-            'property': property,
-            'country_choices': Property.COUNTRIES,
-            'status_choices': Property.STATUS,
-            'province_choices': Property.PROVINCES,
-            'garage_choices': House.GARAGES
         })
 
 

@@ -8,12 +8,17 @@
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+  {% load static %}
+  <script src="{% static 'property/js/edit.js' %}"></script>
 </head>
 <body>
 {% include './nav.html' %}
-
+{% csrf_token %}
+<script type="text/javascript">
+// using jQuery
+const csrftoken = $("[name=csrfmiddlewaretoken]").val();
+</script>
 <div class="container">
-<h1>Property at {{property.street_address}}</h1>
 <hr />
 {% if errors %}
 <div class="alert alert-danger" role="alert">
@@ -25,10 +30,14 @@
   </ul>
 </div>
 {% endif %}
+
+
+<!-- Property Information -->
+
+<h1>Property at {{property.street_address}}</h1>
 <form id="edit_property" action="{% url 'property:edit' property.id %}" method="post">
-{% csrf_token %}
   <input class="form-control" type="hidden" name="type" value="property" />
-  <input class="form-control" type="hidden" name="pk" value="{{property.pk}}" />
+  <input class="form-control" type="hidden" name="pk" id="property_id" value="{{property.pk}}" />
 
 
   <!--property_type-->
@@ -163,10 +172,10 @@
   <!--description-->
   <div class="form-group">
     <label for="description">Description of property</label>
-    <textarea class="form-control" name="description" id="description" rows=5 cols=70 form="new_property" required>{{property.description}}</textarea>
+    <textarea class="form-control" name="description" id="description" rows=5 cols=70 form="edit_property" required>{{property.description}}</textarea>
   </div>
 
-  <input class="btn btn-primary" type="submit" value="Save Changes" />
+  <input class="saveform btn btn-primary" type="button" value="Save Changes" />
 </form>
 
 
@@ -210,7 +219,7 @@
       <br />
       <textarea class="form-control" name="description" id="lot_{{lot.pk}}__description" rows=3 cols=70 form="edit_lot_{{lot.pk}}" required>{{lot.description}}</textarea>
       <br />
-      <input class="btn btn-primary" type="submit" value="Save Changes" />
+      <input class="saveform btn btn-primary" type="button" value="Save Changes" />
     </div>
   </form>
   <h3>Structures on the land that aren't the primary house</h3>
@@ -241,19 +250,19 @@
         <br />
         <textarea class="form-control" name="description" id="structure_{{structure.pk}}__description" rows=3 cols=70 form="edit_structure_{{structure.pk}}" required>{{structure.description}}</textarea>
         <br />
-        <input class="btn btn-primary" type="submit" value="Save Changes" />
+        <input class="saveform btn btn-primary" type="button" value="Save Changes" />
       </div>
     </form>
   {% endfor %}
   {% else %}
   <p>No other structures.</p>
   {% endif %}
-  <input class="btn btn-success" type="button" value="Add Structure" />
+  <input class="additem btn btn-success" type="button" data-model="structure" data-parent="{{lot.pk}}" value="Add Structure" /><br />
 {% endfor %}
 {% else %}
 <p>No land included.</p>
 {% endif %}
-<input class="btn btn-success" type="button" value="Add Lot"/>
+<input class="additem btn btn-success" type="button" data-model="lot" data-parent="{{property.pk}}" value="Add Lot"/>
 
 
 <!-- House Information -->
@@ -339,7 +348,7 @@
       <textarea class="form-control" name="extras" id="house_{{house.pk}}__extras" rows=3 cols=70 form="edit_house_{{house.pk}}" required>{{house.extras}}</textarea>
       </div>
 
-      <input class="btn btn-primary" type="submit" value="Save Changes" />
+      <input class="saveform btn btn-primary" type="button" value="Save Changes" />
     </div>
   </form>
   <h3>Rooms in the house:</h3>
@@ -360,17 +369,15 @@
       <tr>
         <td>
           {{room.pk}}
-          <input class="form-control" type="hidden" name="type" value="suiteroom" />
-          <input class="form-control" type="hidden" name="pk" value="{{room.pk}}" />
         </td>
         <td>
-          <input class="form-control" name="role" id="suiteroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
+          <input class="form-control" name="{{room.pk}}_role" id="houseroom_{{room.pk}}__role" type="text" placeholder="bedroom, bathroom, kitchen, ..." value="{{room.role}}" required />
         </td>
         <td>
-          <input class="form-control" name="square_meters" id="suiteroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
+          <input class="form-control" name="{{room.pk}}_square_meters" id="houseroom_{{room.pk}}__square_meters" type="number" placeholder="13.6" min="0" step="0.1" value="{{room.square_meters}}" required />
         </td>
         <td>
-          <input class="form-control" name="floor" id="suiteroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
+          <input class="form-control" name="{{room.pk}}_floor" id="houseroom_{{room.pk}}__floor" type="number" placeholder="1 is ground, -1 is basement" value="{{room.floor}}" required />
         </td>
         <td>
           <input class="btn btn-danger" type="button" value="X">
@@ -384,14 +391,15 @@
     {% endif %}
     </tbody>
   </table>
+  <input class="form-control" type="hidden" name="type" value="suiteroom" />
+  <input class="saveform btn btn-primary" type="button" value="Save Changes"/>
   </form>
-  <input class="btn btn-primary" type="button" value="Save Changes"/>
-  <input class="btn btn-success" type="button" value="Add Room"/>
+  <input class="additem btn btn-success" type="button" data-model="houseroom" data-parent="{{house.pk}}" value="Add Room"/><br />
 {% endfor %}
 {% else %}
 <p>No house listed</p>
 {% endif %}
-<input class="btn btn-success" type="button" value="Add House"/>
+<input class="additem btn btn-success" type="button" data-model="house" data-parent="{{property.pk}}" value="Add House"/>
 
 
 <!-- Suite information -->
@@ -555,7 +563,7 @@
         <textarea class="form-control" name="extras" id="suite_{{suite.pk}}__extras" rows=3 cols=70 form="edit_suite_{{suite.pk}}" required>{{suite.extras}}</textarea>
       </div>
 
-      <input class="btn btn-primary" type="submit" value="Save Changes" />
+      <input class="saveform btn btn-primary" type="button" value="Save Changes" />
     </div>
   </form>
   <h3>Rooms in the suite:</h3>
@@ -601,13 +609,13 @@
     </tbody>
   </table>
   </form>
-  <input class="btn btn-primary" type="submit" value="Save Changes" />
-  <input class="btn btn-success" type="button" value="Add Room"/>
+  <input class="saveform btn btn-primary" type="button" value="Save Changes" />
+  <input class="additem btn btn-success" type="button" data-model="suiteroom" data-parent="{{suite.pk}}" value="Add Room"/><br />
 {% endfor %}
 {% else %}
 <p>No suite listed</p>
 {% endif %}
-<input class="btn btn-success" type="button" value="Add Suite"/>
+<input class="additem btn btn-success" type="button" data-model="suite" data-parent="{{property.pk}}" value="Add Suite"/>
 
 
 <!-- Seller's Contact Info -->

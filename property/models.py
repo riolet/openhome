@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 import re
 
 
@@ -154,6 +155,29 @@ class Property(models.Model):
         prop_id = "{}{:09d}".format(prefix, next_num)
         return prop_id
 
+    @staticmethod
+    def construct_default(owner):
+        p = Property()
+        p.owner = owner
+        p.creation_stamp = timezone.now()
+        p.publish_stamp = None
+        p.edit_stamp = timezone.now()
+        p.status = 'U'
+        p.description = 'blank property listing'
+        p.price = 1
+        p.property_type = 'unspecified'
+        p.property_tax = 1
+        p.country = 'CAN'
+        p.province = 'BC'
+        p.region = ''
+        p.city = 'unspecified'
+        p.neighborhood = ''
+        p.street_address = 'unspecified'
+        p.postal_code = 'A1A1A1'
+        p.latitude = 1.0
+        p.longitude = 1.0
+        return p
+
     def __str__(self):
         return self.id
 
@@ -171,6 +195,17 @@ class Lot(models.Model):
     depth = models.FloatField()
     description = models.TextField()
     zoning = models.CharField(max_length=100, default="residential")
+
+    @staticmethod
+    def construct_default(property):
+        l = Lot()
+        l.property = property
+        l.square_meters = 4
+        l.width = 2
+        l.depth = 2
+        l.description = 'blank'
+        l.zoning = 'residential'
+        return l
 
     def __str__(self):
         return "{}sqm in {}".format(self.square_meters, self.property)
@@ -206,7 +241,23 @@ class House(models.Model):
     # Parking situation (dedicated street parking, street, underground, garage, helipad...)
     parking = models.CharField(max_length=100)
     # catch-all for additional features such as alarm system, fireplace, pool, sauna, etc.
-    extras = models.TextField()
+    extras = models.TextField(null=False, blank=True)
+
+    @staticmethod
+    def construct_default(property):
+        h = House()
+        h.property = property
+        h.year = 2000
+        h.beds = 0
+        h.baths = 0
+        h.halfbaths = 0
+        h.square_meters = 0
+        h.floors = 0
+        h.basements = 0
+        h.garage = '0'
+        h.parking = "unspecified"
+        h.extras = ""
+        return h
 
     def __str__(self):
         return "{}-bed, {}-storey house".format(self.beds, self.floors)
@@ -242,7 +293,7 @@ class Suite(models.Model):
     # Parking situation (dedicated street parking, street, underground, garage, helipad...)
     parking = models.CharField(max_length=100)
     # catch-all for additional features such as alarm system, fireplace, pool, sauna, etc.
-    extras = models.TextField()
+    extras = models.TextField(null=False, blank=True)
 
     # room unit 221A, 4, #209, 2211B, 2-1104
     unit_number = models.CharField(max_length=10)
@@ -255,6 +306,32 @@ class Suite(models.Model):
     shared_laundry = models.BooleanField(default=False)
     units_in_building = models.IntegerField()
     building_floors = models.IntegerField()
+
+    @staticmethod
+    def construct_default(property):
+        s = Suite()
+        s.property = property
+        s.year = 2000
+        s.beds = 0
+        s.baths = 0
+        s.halfbaths = 0
+        s.square_meters = 0
+        s.floors = 0
+        s.basements = 0
+        s.garage = '0'
+        s.parking = "unspecified"
+        s.extras = ""
+        s.unit_number = '0'
+        s.annual_strata_fee = 0
+        s.pet_rules = 'None'
+        s.shared_fitness_room = False
+        s.shared_laundry = False
+        s.shared_party_room = False
+        s.shared_pool = False
+        s.shared_private_courtyard = False
+        s.units_in_building = 0
+        s.building_floors = 0
+        return s
 
     def __str__(self):
         return "{}-bed, {}-sqm suite".format(self.beds, self.square_meters)
@@ -270,6 +347,17 @@ class Structure(models.Model):
     height = models.FloatField()
     description = models.TextField()
 
+    @staticmethod
+    def construct_default(lot):
+        s = Structure()
+        s.lot = lot
+        s.square_meters = 0
+        s.width = 0
+        s.depth = 0
+        s.height = 0
+        s.description = 'unspecified structure'
+        return s
+
     def __str__(self):
         return "{:.3g}x{:.3g}x{:.3g} structure".format(self.width, self.depth, self.height)
 
@@ -283,6 +371,15 @@ class HouseRoom(models.Model):
     floor = models.IntegerField()
     # bedroom, bathroom, kitchen, storage, multi-purpose, ...
     role = models.CharField(max_length=100)
+
+    @staticmethod
+    def construct_default(house):
+        r = HouseRoom()
+        r.house = house
+        r.square_meters = 0
+        r.floor = 1
+        r.role = "unspecified"
+        return r
 
     def __str__(self):
         return "{}sqm {}".format(self.square_meters, self.role[:20])
@@ -298,11 +395,14 @@ class SuiteRoom(models.Model):
     # bedroom, bathroom, kitchen, storage, multi-purpose, ...
     role = models.CharField(max_length=100)
 
+    @staticmethod
+    def construct_default(suite):
+        r = SuiteRoom()
+        r.suite = suite
+        r.square_meters = 0
+        r.floor = 1
+        r.role = "unspecified"
+        return r
+
     def __str__(self):
         return "{}sqm {}".format(self.square_meters, self.role[:20])
-
-
-
-
-
-
