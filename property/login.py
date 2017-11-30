@@ -47,6 +47,8 @@ class LoginView:
 
     def get_token(self):
         authorization_response = self.request.build_absolute_uri()
+        # hack to make https
+        authorization_response.replace("http:", "https:", 1)
         try:
             # redirect_uri must match between get_auth_code and get_token.
             # scope must match between get_auth_code and get_token
